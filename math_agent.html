@@ -1485,27 +1485,12 @@ async function sendConceptFollowup() {
     chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
     chat.scrollTop = chat.scrollHeight;
   } catch(e) {
-    chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
+    chat.innerHTML += `<div class="chat-msg chat-ai error-box" style="margin:6px 0">回复失败</div>`;
   }
   document.getElementById('conceptFollowupBtn').disabled = false;
 }
-  const input = document.getElementById('conceptFollowup');
-  const q = input.value.trim(); if (!q) return;
-  const chat = document.getElementById('conceptChatHistory');
-  chat.innerHTML += `<div class="chat-msg chat-user">${q}</div>`;
-  input.value = '';
-  document.getElementById('conceptFollowupBtn').disabled = true;
-  conceptHistory.push({ role: 'user', content: q });
-  try {
-    const resp = await callAPI(q, CONCEPT_SYSTEM, conceptHistory);
-    conceptHistory.push({ role: 'assistant', content: resp });
-    chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
-    chat.scrollTop = chat.scrollHeight;
-  } catch(e) {
-    chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
-  }
-  document.getElementById('conceptFollowupBtn').disabled = false;
-}
+
+
 
 // ── PRACTICE TAB ──
 const PRACTICE_SYSTEM = `你是"不等式侦探"，专门给初中生出不等式练习题并给出思维反馈。
