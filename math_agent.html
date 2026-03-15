@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>不等式侦探 · 数学思维训练</title>
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] },
+  startup: { typeset: false }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" async></script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -281,13 +289,26 @@ header {
 .followup-btn:hover { background: var(--teal2); color: var(--bg); }
 .followup-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .chat-msg {
-  margin: 6px 0; padding: 8px 12px; border-radius: 7px;
-  font-size: 12.5px; line-height: 1.75;
+  margin: 8px 0; padding: 10px 13px; border-radius: 10px;
+  font-size: 13px; line-height: 1.8;
 }
-.chat-user { background: var(--bg3); color: var(--muted); border: 1px solid var(--muted2); }
-.chat-user::before { content: '你 · '; font-weight: 700; color: var(--paper); }
-.chat-ai { background: rgba(44,181,160,0.07); color: rgba(255,255,254,0.75); border: 1px solid rgba(44,181,160,0.15); }
-.chat-ai::before { content: '侦探 · '; font-weight: 700; color: var(--teal2); }
+.chat-user {
+  background: rgba(255,255,254,0.05); color: rgba(255,255,254,0.82);
+  border: 1px solid var(--muted2);
+  border-radius: 12px 12px 2px 12px; margin-left: 20px;
+}
+.chat-user::before { content: '你'; display: block; font-size: 10px; font-weight: 700; color: var(--paper); letter-spacing: 1px; margin-bottom: 3px; }
+.chat-ai {
+  background: rgba(232,169,48,0.07); color: rgba(255,255,254,0.82);
+  border: 1px solid rgba(232,169,48,0.15);
+  border-radius: 2px 12px 12px 12px; margin-right: 20px;
+}
+.chat-ai::before { content: '🔍 侦探'; display: block; font-size: 10px; font-weight: 700; color: var(--amber2); letter-spacing: 1px; margin-bottom: 3px; }
+/* concept/practice followup uses teal color */
+.chat-ai.teal-ai {
+  background: rgba(44,181,160,0.07); border-color: rgba(44,181,160,0.15);
+}
+.chat-ai.teal-ai::before { color: var(--teal2); }
 
 /* Number line visual */
 .numberline-box {
@@ -569,14 +590,15 @@ header {
             <div class="stage-dot"></div>
             <div class="stage-label" id="stageLabel">分析中</div>
           </div>
+          <!-- Conversation thread: detective + student interleaved -->
           <div class="response-body" id="guideBody"></div>
           <div class="followup">
-            <div class="followup-label">继续问侦探</div>
+            <div class="followup-label">你的回答 / 追问</div>
             <div class="followup-row">
               <input class="followup-input" id="guideFollowup"
-                placeholder="还有哪步不确定？"
+                placeholder="回答侦探的问题，或继续追问……"
                 onkeydown="if(event.key==='Enter')sendGuideFollowup()">
-              <button class="followup-btn" id="guideFollowupBtn" onclick="sendGuideFollowup()" disabled>问</button>
+              <button class="followup-btn" id="guideFollowupBtn" onclick="sendGuideFollowup()" disabled>发送</button>
             </div>
             <div id="guideChatHistory"></div>
           </div>
@@ -726,9 +748,42 @@ header {
             <div class="card-title">你的解题过程</div>
           </div>
           <div class="card-body">
-            <textarea class="input-area" id="answerInput" style="min-height:120px"
-              placeholder="写下你的解题步骤……&#10;&#10;不用只写答案，把每一步都写出来，侦探会分析你的思路。"></textarea>
-            <button class="btn-submit" style="background:linear-gradient(135deg,var(--teal),#1a8a7a);box-shadow:0 4px 16px rgba(44,181,160,0.25)"
+            <!-- Answer method tabs -->
+            <div class="input-method-tabs">
+              <button class="input-method-btn active" id="ans-method-text" onclick="switchAnswerMethod('text')">⌨️ 文字输入</button>
+              <button class="input-method-btn" id="ans-method-photo" onclick="switchAnswerMethod('photo')">📷 拍照上传</button>
+            </div>
+
+            <!-- Text answer -->
+            <div class="input-section active" id="ans-section-text">
+              <textarea class="input-area" id="answerInput" style="min-height:120px"
+                placeholder="写下你的解题步骤……&#10;&#10;不用只写答案，把每一步都写出来，侦探会分析你的思路。"></textarea>
+            </div>
+
+            <!-- Photo answer -->
+            <div class="input-section" id="ans-section-photo">
+              <div class="upload-zone" id="ansUploadZone"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleAnsFileDrop(event)">
+                <input type="file" accept="image/*" capture="environment" onchange="handleAnsFileSelect(event)" id="ansFileInput">
+                <div class="upload-icon">✍️</div>
+                <div class="upload-text">
+                  <strong>拍一张手写解题过程</strong><br>
+                  侦探会识别你的步骤并逐一分析<br>
+                  <span style="font-size:11px;opacity:0.6">支持手写 / 打印 / 截图</span>
+                </div>
+              </div>
+              <div class="preview-box" id="ansPreviewBox">
+                <img id="ansPreviewImg" src="" alt="解题过程">
+                <button class="preview-clear" onclick="clearAnsPhoto()">✕</button>
+              </div>
+              <div id="ansOcrStatus" style="display:none;margin-top:8px;font-size:12px;color:var(--teal2);text-align:center">
+                📝 已识别手写内容，侦探将直接分析图片
+              </div>
+            </div>
+
+            <button class="btn-submit" style="background:linear-gradient(135deg,var(--teal),#1a8a7a);box-shadow:0 4px 16px rgba(44,181,160,0.25);margin-top:12px"
               onclick="submitAnswer()">提交解题过程</button>
           </div>
         </div>
@@ -812,6 +867,13 @@ function formatResponse(text) {
     .replace(/`([^`]+)`/g, '<code style="font-family:JetBrains Mono,monospace;background:rgba(255,255,254,0.08);padding:1px 5px;border-radius:3px;font-size:12px">$1</code>')
     .replace(/\n\n/g, '</p><p>')
     .replace(/\n/g, '<br>');
+}
+
+// ── Render MathJax after DOM update ──
+function renderMath(el) {
+  if (window.MathJax && MathJax.typesetPromise) {
+    MathJax.typesetPromise(el ? [el] : undefined).catch(e => console.warn('MathJax error', e));
+  }
 }
 
 // ── INPUT METHOD ──
@@ -949,18 +1011,13 @@ async function submitGuide() {
   // Determine input source
   let input = '';
   if (currentInputMethod === 'photo') {
-    // If OCR result available, use it; otherwise use image directly
     const ocrText = document.getElementById('ocrText').value.trim();
-    if (ocrText) {
-      input = ocrText;
-    } else if (currentImageBase64) {
-      // No OCR yet — run it first
+    if (ocrText) { input = ocrText; }
+    else if (currentImageBase64) {
       await runOCR();
       input = document.getElementById('ocrText').value.trim();
       if (!input) return;
-    } else {
-      return;
-    }
+    } else { return; }
   } else {
     input = document.getElementById('guideInput').value.trim();
   }
@@ -973,17 +1030,24 @@ async function submitGuide() {
   document.getElementById('guideContent').classList.add('visible');
   document.getElementById('stageLabel').textContent = '分析题目中';
 
+  // Show the question as a "student" bubble first
+  const chat = document.getElementById('guideChatHistory');
+  document.getElementById('guideBody').innerHTML = '';
+  chat.innerHTML = `<div class="chat-msg chat-user">${input.replace(/</g,'&lt;')}</div>`;
+
   const prompt = `学生输入：${input}\n\n请先判断这是一道需要解题引导的题目，还是学生在描述自己的困惑。然后开始你的苏格拉底式引导。`;
   guideHistory = [{ role: 'user', content: prompt }];
 
   try {
     const resp = await callAPI(prompt, GUIDE_SYSTEM);
     guideHistory.push({ role: 'assistant', content: resp });
-    document.getElementById('stageLabel').textContent = '引导进行中';
-    document.getElementById('guideBody').innerHTML = '<p>' + formatResponse(resp) + '</p>';
+    document.getElementById('stageLabel').textContent = '等待你的回答';
+    chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
+    renderMath(chat);
+    chat.scrollTop = chat.scrollHeight;
     document.getElementById('guideFollowupBtn').disabled = false;
   } catch(e) {
-    document.getElementById('guideBody').innerHTML = `<div class="error-box">⚠️ 连接失败：${e.message}</div>`;
+    chat.innerHTML += `<div class="error-box" style="margin:8px 0">⚠️ 连接失败：${e.message}</div>`;
   }
 
   btn.disabled = false;
@@ -1002,6 +1066,7 @@ async function sendGuideFollowup() {
     const resp = await callAPI(q, GUIDE_SYSTEM, guideHistory);
     guideHistory.push({ role: 'assistant', content: resp });
     chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
+    renderMath(chat);
     chat.scrollTop = chat.scrollHeight;
   } catch(e) {
     chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
@@ -1064,7 +1129,7 @@ const VISUALS = {
         </div>
         <div class="visual-caption" id="balance-caption">天平平衡代表等式。点击按钮，观察不等式时天平如何倾斜。</div>
       </div>`,
-    init: () => { window.setBalance = setBalance; }
+    init: () => { /* setBalance is globally defined */ }
   },
   properties: {
     title: '不等式性质演示',
@@ -1453,6 +1518,7 @@ async function loadConceptAI(key, title) {
     const resp = await callAPI(prompt, CONCEPT_SYSTEM);
     conceptHistory.push({ role: 'assistant', content: resp });
     document.getElementById('conceptBody').innerHTML = '<p>' + formatResponse(resp) + '</p>';
+    renderMath(document.getElementById('conceptBody'));
     document.getElementById('conceptFollowupBtn').disabled = false;
   } catch(e) {
     document.getElementById('conceptBody').innerHTML = `<div class="error-box">连接失败：${e.message}</div>`;
@@ -1460,7 +1526,184 @@ async function loadConceptAI(key, title) {
   document.getElementById('conceptLoading').classList.remove('active');
 }
 
-// ── System example switcher ──
+// ── SVG Interaction Functions ──
+
+// Balance / inequality diagram
+function setBalance(mode) {
+  document.querySelectorAll('#svg-inequality ~ .visual-controls .visual-btn, .visual-controls .visual-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['equal','greater','less'][i] === mode);
+  });
+  const beam  = document.getElementById('beam');
+  const lrope = document.getElementById('lrope');
+  const rrope = document.getElementById('rrope');
+  const lpan  = document.getElementById('lpan');
+  const rpan  = document.getElementById('rpan');
+  const lw1   = document.getElementById('lw1');
+  const rw1   = document.getElementById('rw1');
+  const sym   = document.getElementById('sym');
+  const lbl   = document.getElementById('balance-label');
+  const cap   = document.getElementById('balance-caption');
+  if (!beam) return;
+
+  if (mode === 'equal') {
+    beam.setAttribute('transform', '');
+    lrope.setAttribute('y2','80'); lpan.setAttribute('y','80'); lw1.setAttribute('y','62');
+    rrope.setAttribute('y2','80'); rpan.setAttribute('y','80'); rw1.setAttribute('y','62');
+    sym.textContent = '=';
+    lbl.textContent = '等式：3x = 9，天平平衡';
+    cap.textContent = '两边相等，天平水平——这就是等式的含义。';
+  } else if (mode === 'greater') {
+    beam.setAttribute('transform','rotate(-12,180,55)');
+    lrope.setAttribute('y2','90'); lpan.setAttribute('y','90'); lw1.setAttribute('y','72');
+    rrope.setAttribute('y2','70'); rpan.setAttribute('y','70'); rw1.setAttribute('y','52');
+    sym.textContent = '>';
+    lbl.textContent = '不等式：左边 > 右边，天平左倾';
+    cap.textContent = '左边更重，天平向左倾斜——左边大于右边。';
+  } else {
+    beam.setAttribute('transform','rotate(12,180,55)');
+    lrope.setAttribute('y2','70'); lpan.setAttribute('y','70'); lw1.setAttribute('y','52');
+    rrope.setAttribute('y2','90'); rpan.setAttribute('y','90'); rw1.setAttribute('y','72');
+    sym.textContent = '<';
+    lbl.textContent = '不等式：左边 < 右边，天平右倾';
+    cap.textContent = '右边更重，天平向右倾斜——左边小于右边。';
+  }
+}
+
+// Flip axis (negative number demo)
+function initFlipAxis() {
+  window.flipAxis = function(factor) {
+    ['flip-btn-orig','flip-btn-neg1','flip-btn-neg2'].forEach((id,i) =>
+      document.getElementById(id)?.classList.toggle('active', [1,-1,-2][i] === factor));
+    const a = 2 * factor, b = 5 * factor;
+    const toX = v => 180 + v * 20;
+    const ptA = document.getElementById('pt-a');
+    const ptB = document.getElementById('pt-b');
+    const lblA = document.getElementById('lbl-a');
+    const lblB = document.getElementById('lbl-b');
+    const rel  = document.getElementById('flip-rel');
+    const status = document.getElementById('flip-status');
+    const cap  = document.getElementById('flip-caption');
+    if (!ptA) return;
+    ptA.setAttribute('cx', toX(a)); lblA.setAttribute('x', toX(a)); lblA.textContent = a;
+    ptB.setAttribute('cx', toX(b)); lblB.setAttribute('x', toX(b)); lblB.textContent = b;
+    const sym = a < b ? '<' : a > b ? '>' : '=';
+    rel.setAttribute('x', (toX(a)+toX(b))/2);
+    rel.innerHTML = `${a} ${sym} ${b}`;
+    if (factor < 0) {
+      status.textContent = `⚠️ 乘以负数，大小关系翻转！`;
+      if (cap) cap.textContent = `原来 2 < 5，乘以 ${factor} 后：${a} ${sym} ${b}。方向对调了！`;
+    } else {
+      status.textContent = '';
+      if (cap) cap.textContent = '乘以正数，大小关系保持不变。';
+    }
+  };
+}
+
+// Step-by-step solve
+let solveStepIdx = 0;
+const SOLVE_STEPS = [
+  { expr: '3 − 2x ≥ 5', note: '原式', warning: false },
+  { expr: '−2x ≥ 5 − 3', note: '移项：把常数3移到右边（注意变号）', warning: false },
+  { expr: '−2x ≥ 2', note: '合并同类项：5 − 3 = 2', warning: false },
+  { expr: 'x ≤ −1', note: '两边除以 −2（⚠️ 负数！大于变小于）', warning: true },
+  { expr: '解集：x ≤ −1', note: '数轴上：−1处实心圆●，向左箭头←', warning: false },
+];
+
+function initSolveSteps() {
+  solveStepIdx = 0;
+  renderSolveSteps();
+}
+
+function renderSolveSteps() {
+  const container = document.getElementById('solve-steps');
+  if (!container) return;
+  let html = '';
+  for (let i = 0; i <= solveStepIdx; i++) {
+    const s = SOLVE_STEPS[i];
+    const isLast = i === solveStepIdx;
+    const bg = s.warning ? 'rgba(224,92,92,0.12)' : isLast ? 'rgba(44,181,160,0.1)' : 'rgba(255,255,254,0.03)';
+    const border = s.warning ? '#e05c5c' : isLast ? '#3dd9c1' : '#333';
+    html += `<div style="padding:8px 12px;margin-bottom:6px;border-radius:7px;background:${bg};border-left:3px solid ${border};transition:all 0.3s">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:14px;color:${isLast?'#f5c842':'#bbb'};font-weight:${isLast?'bold':'normal'}">${s.expr}</div>
+      <div style="font-size:11px;color:#888;margin-top:3px">${s.warning?'⚠️ ':''}${s.note}</div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  const prevBtn = document.getElementById('solve-prev-btn');
+  const nextBtn = document.getElementById('solve-next-btn');
+  if (prevBtn) prevBtn.disabled = solveStepIdx === 0;
+  if (nextBtn) nextBtn.disabled = solveStepIdx === SOLVE_STEPS.length - 1;
+  const cap = document.getElementById('solve-caption');
+  if (cap) cap.textContent = `步骤 ${solveStepIdx+1} / ${SOLVE_STEPS.length}：${SOLVE_STEPS[solveStepIdx].note}`;
+}
+
+function solveStep(dir) {
+  solveStepIdx = Math.max(0, Math.min(SOLVE_STEPS.length-1, solveStepIdx+dir));
+  renderSolveSteps();
+}
+function solveReset() { solveStepIdx = 0; renderSolveSteps(); }
+
+// Interactive number line
+function initNumberLine() {
+  window.setNL = function(mode) {
+    const nlSvg = document.getElementById('nl-svg'); if (!nlSvg) return;
+    document.querySelectorAll('.visual-controls .visual-btn').forEach(b => b.classList.remove('active'));
+    event?.target?.classList?.add('active');
+    const fill      = document.getElementById('nl-fill');
+    const circle    = document.getElementById('nl-circle');
+    const arrow     = document.getElementById('nl-arrow');
+    const arrowhead = document.getElementById('nl-arrowhead');
+    const label     = document.getElementById('nl-label');
+    const expr      = document.getElementById('nl-expr');
+    const cap       = document.getElementById('nl-caption');
+    const toX = v => 180 + v * 25;
+
+    const configs = {
+      'gt2':   { v:2,  dir:'right', open:true,  text:'x &gt; 2',  caption:'空心圆：不包含2本身。向右延伸——所有大于2的数都是解。' },
+      'gte2':  { v:2,  dir:'right', open:false, text:'x ≥ 2',     caption:'实心圆：包含2本身。向右延伸——所有大于等于2的数都是解。' },
+      'lt-1':  { v:-1, dir:'left',  open:true,  text:'x &lt; -1', caption:'空心圆：不包含-1本身。向左延伸——所有小于-1的数都是解。' },
+      'lte-1': { v:-1, dir:'left',  open:false, text:'x ≤ -1',    caption:'实心圆：包含-1本身。向左延伸——所有小于等于-1的数都是解。' },
+      'range': { v:null, text:'-1 &lt; x ≤ 3', caption:'左端空心圆（不含-1），右端实心圆（含3）。中间线段是解集区间。' },
+    };
+    const c = configs[mode]; if (!c) return;
+
+    // Remove old second circle
+    const old2 = document.getElementById('nl-circle2');
+    if (old2) old2.remove();
+
+    if (mode === 'range') {
+      const x1 = toX(-1), x2 = toX(3);
+      if (fill)      { fill.setAttribute('x', x1); fill.setAttribute('width', x2-x1); }
+      if (circle)    { circle.setAttribute('cx', x1); circle.setAttribute('fill','none'); }
+      if (arrow)     { arrow.setAttribute('x1', x1); arrow.setAttribute('x2', x2); }
+      if (arrowhead) arrowhead.style.display = 'none';
+      // Add second circle for right bound
+      const c2 = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c2.setAttribute('id','nl-circle2'); c2.setAttribute('cy','50'); c2.setAttribute('r','6');
+      c2.setAttribute('fill','#3dd9c1'); c2.setAttribute('stroke','#3dd9c1'); c2.setAttribute('stroke-width','2.5');
+      c2.setAttribute('cx', x2);
+      nlSvg.appendChild(c2);
+      if (label) { label.setAttribute('x', 180); label.textContent = '-1 < x ≤ 3'; }
+    } else {
+      const cx = toX(c.v);
+      if (fill) {
+        fill.setAttribute('x', c.dir==='right' ? cx : 30);
+        fill.setAttribute('width', c.dir==='right' ? 320-cx : cx-30);
+      }
+      if (circle) { circle.setAttribute('cx', cx); circle.setAttribute('fill', c.open ? 'none' : '#3dd9c1'); }
+      if (arrow)  { arrow.setAttribute('x1', cx); arrow.setAttribute('x2', c.dir==='right' ? 325 : 35); }
+      if (arrowhead) {
+        arrowhead.style.display = '';
+        arrowhead.setAttribute('points', c.dir==='right' ? '320,46 330,50 320,54' : '40,46 30,50 40,54');
+      }
+      if (label) { label.setAttribute('x', cx); label.textContent = c.v; }
+    }
+    if (expr) expr.innerHTML = c.text;
+    if (cap)  cap.textContent = c.caption;
+  };
+}
+
+// System example switcher ──
 function initSystemExamples() {
   window.setSysExample = function(type, btn) {
     document.querySelectorAll('#sys-svg').forEach(() => {});
@@ -1542,6 +1785,7 @@ async function generatePractice() {
     practiceHistory.push({ role: 'assistant', content: resp });
     currentQuestion = resp;
     document.getElementById('practiceBody').innerHTML = '<p>' + formatResponse(resp) + '</p>';
+    renderMath(document.getElementById('practiceBody'));
     document.getElementById('practiceFollowupBtn').disabled = false;
   } catch(e) {
     document.getElementById('practiceBody').innerHTML = `<div class="error-box">出题失败：${e.message}</div>`;
@@ -1550,19 +1794,34 @@ async function generatePractice() {
 }
 
 async function submitAnswer() {
-  const answer = document.getElementById('answerInput').value.trim();
-  if (!answer || !currentQuestion) return;
-  document.getElementById('practiceLoading').classList.add('active');
+  if (!currentQuestion) return;
 
-  const prompt = `学生提交的解题过程：\n${answer}\n\n请给出详细的思维反馈。`;
+  let answer = '';
+  let ansImage = null;
+  let ansImageMime = 'image/jpeg';
+  const method = document.getElementById('ans-method-photo')?.classList.contains('active') ? 'photo' : 'text';
+
+  if (method === 'photo' && answerImageBase64) {
+    ansImage = answerImageBase64;
+    ansImageMime = answerImageMime;
+    answer = '（手写解题过程图片，请识别并分析学生的解题步骤）';
+  } else {
+    answer = document.getElementById('answerInput').value.trim();
+    if (!answer) return;
+  }
+
+  document.getElementById('practiceLoading').classList.add('active');
+  const prompt = `学生提交的解题过程：\n${answer}\n\n请识别学生的每一个解题步骤，分析思维路径，指出哪步对哪步错，给出改进建议。`;
   practiceHistory.push({ role: 'user', content: prompt });
 
   try {
-    const resp = await callAPI(prompt, PRACTICE_SYSTEM, practiceHistory);
+    const resp = await callAPI(prompt, PRACTICE_SYSTEM, practiceHistory, ansImage, ansImageMime);
     practiceHistory.push({ role: 'assistant', content: resp });
-    document.getElementById('practiceBody').innerHTML += '<hr style="border:none;border-top:1px solid rgba(255,255,254,0.08);margin:14px 0"><p>' + formatResponse(resp) + '</p>';
+    const body = document.getElementById('practiceBody');
+    body.innerHTML += '<hr style="border:none;border-top:1px solid rgba(255,255,254,0.08);margin:14px 0"><p>' + formatResponse(resp) + '</p>';
+    renderMath(body);
     document.getElementById('practiceFollowupBtn').disabled = false;
-    document.getElementById('practiceBody').scrollTop = document.getElementById('practiceBody').scrollHeight;
+    body.scrollTop = body.scrollHeight;
   } catch(e) {
     document.getElementById('practiceBody').innerHTML += `<div class="error-box" style="margin:8px 0">反馈失败：${e.message}</div>`;
   }
@@ -1586,6 +1845,49 @@ async function sendPracticeFollowup() {
     chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
   }
   document.getElementById('practiceFollowupBtn').disabled = false;
+}
+
+// ── Answer photo upload ──
+let answerImageBase64 = null;
+let answerImageMime = 'image/jpeg';
+
+function switchAnswerMethod(method) {
+  ['text','photo'].forEach(m => {
+    document.getElementById('ans-method-'+m)?.classList.toggle('active', m===method);
+    document.getElementById('ans-section-'+m)?.classList.toggle('active', m===method);
+  });
+}
+
+function handleAnsFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processAnsImage(file);
+}
+
+function handleAnsFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('ansUploadZone')?.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processAnsImage(file);
+}
+
+function processAnsImage(file) {
+  answerImageMime = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = e => {
+    const dataUrl = e.target.result;
+    answerImageBase64 = dataUrl.split(',')[1];
+    document.getElementById('ansPreviewImg').src = dataUrl;
+    document.getElementById('ansPreviewBox').style.display = 'block';
+    document.getElementById('ansOcrStatus').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearAnsPhoto() {
+  answerImageBase64 = null;
+  document.getElementById('ansPreviewBox').style.display = 'none';
+  document.getElementById('ansOcrStatus').style.display = 'none';
+  document.getElementById('ansFileInput').value = '';
 }
 
 // ── Init ──
