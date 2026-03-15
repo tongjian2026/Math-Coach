@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>不等式侦探 · 数学思维训练</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0f0e17;
+  --bg2:     #16151f;
+  --bg3:     #1d1c28;
+  --paper:   #fffffe;
+  --amber:   #e8a930;
+  --amber2:  #f5c842;
+  --teal:    #2cb5a0;
+  --teal2:   #3dd9c1;
+  --red:     #e05c5c;
+  --muted:   rgba(255,255,254,0.45);
+  --muted2:  rgba(255,255,254,0.1);
+  --muted3:  rgba(255,255,254,0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--paper);
+  font-family: 'Noto Sans SC', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 5% 15%, rgba(232,169,48,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 95% 85%, rgba(44,181,160,0.06) 0%, transparent 60%);
+}
+
+/* ── HEADER ── */
+header {
+  position: relative; z-index: 10;
+  padding: 22px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--muted2);
+}
+.logo { display: flex; align-items: center; gap: 14px; }
+.logo-mark {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--amber), var(--teal));
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 900;
+  color: var(--bg);
+}
+.logo-text {
+  font-family: 'Fraunces', serif;
+  font-size: 17px; font-weight: 700; letter-spacing: 1px;
+}
+.logo-sub { font-size: 10px; letter-spacing: 3px; color: var(--muted); font-weight: 300; }
+
+.header-badge {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(232,169,48,0.1); border: 1px solid rgba(232,169,48,0.2);
+  border-radius: 20px; padding: 6px 16px;
+  font-size: 11px; color: var(--amber2); font-weight: 500; letter-spacing: 1px;
+}
+
+/* ── HERO ── */
+.hero {
+  position: relative; z-index: 1;
+  padding: 44px 40px 32px;
+  max-width: 1100px; margin: 0 auto;
+}
+.hero-eyebrow { font-size: 10px; letter-spacing: 5px; color: var(--amber); font-weight: 600; margin-bottom: 14px; opacity: 0.8; }
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(26px, 4vw, 46px);
+  font-weight: 900; line-height: 1.15; margin-bottom: 10px;
+}
+.hero-title em {
+  font-style: italic;
+  background: linear-gradient(135deg, var(--amber2), var(--teal2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.hero-desc {
+  max-width: 500px; font-size: 14px; color: var(--muted);
+  line-height: 1.9; margin-bottom: 24px;
+}
+
+/* Tab strip */
+.tabs {
+  position: relative; z-index: 5;
+  display: flex; gap: 0;
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 40px;
+  border-bottom: 1px solid var(--muted2);
+}
+.tab {
+  padding: 12px 20px; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; color: var(--muted); cursor: pointer;
+  border-bottom: 2px solid transparent; position: relative; top: 1px;
+  transition: all 0.2s; text-transform: uppercase;
+}
+.tab.active { color: var(--amber2); border-bottom-color: var(--amber2); }
+.tab:hover:not(.active) { color: var(--paper); }
+
+/* ── MAIN GRID ── */
+.main {
+  position: relative; z-index: 1;
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 40px 80px;
+}
+.panel { display: none; padding-top: 28px; }
+.panel.active { display: block; }
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 400px;
+  gap: 24px; align-items: start;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--muted2);
+  border-radius: 14px; overflow: hidden;
+}
+.card-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--muted2);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.card-title { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+.card-tag { margin-left: auto; font-size: 10px; color: var(--teal2); font-weight: 600; letter-spacing: 1px; }
+.card-body { padding: 20px; }
+
+/* Mode selector */
+.mode-selector { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.mode-btn {
+  flex: 1; min-width: 120px; padding: 10px 14px;
+  background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 8px; color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+  text-align: center; letter-spacing: 0.5px;
+}
+.mode-btn.active {
+  background: rgba(232,169,48,0.12); border-color: rgba(232,169,48,0.4); color: var(--amber2);
+}
+.mode-btn:hover:not(.active) { color: var(--paper); border-color: var(--muted2); }
+.mode-icon { font-size: 16px; display: block; margin-bottom: 3px; }
+
+/* Input area */
+.input-area {
+  width: 100%; padding: 14px 16px;
+  background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 8px; font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px; color: var(--paper); outline: none; resize: vertical;
+  min-height: 100px; line-height: 1.8; transition: border-color 0.2s;
+}
+.input-area:focus { border-color: rgba(232,169,48,0.4); }
+.input-area::placeholder { color: var(--muted); font-size: 13px; }
+
+/* Concept selector */
+.concept-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.concept-btn {
+  padding: 10px 12px; background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 8px; color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; text-align: left;
+}
+.concept-btn.active { background: rgba(44,181,160,0.12); border-color: rgba(61,217,193,0.3); color: var(--teal2); }
+.concept-btn:hover:not(.active) { color: var(--paper); }
+.concept-num { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); display: block; margin-bottom: 2px; }
+
+/* Difficulty */
+.diff-row { display: flex; gap: 6px; margin-bottom: 14px; }
+.diff-btn {
+  flex: 1; padding: 7px; background: var(--bg3);
+  border: 1px solid var(--muted2); border-radius: 6px;
+  color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.diff-btn.active { background: rgba(232,169,48,0.1); border-color: rgba(232,169,48,0.3); color: var(--amber2); }
+
+/* Submit button */
+.btn-submit {
+  width: 100%; padding: 12px; margin-top: 12px;
+  background: linear-gradient(135deg, var(--amber), #c8871a);
+  border: none; border-radius: 8px; color: var(--bg);
+  font-family: 'Noto Sans SC', sans-serif; font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; letter-spacing: 1px;
+  box-shadow: 0 4px 16px rgba(232,169,48,0.25);
+}
+.btn-submit:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,169,48,0.35); }
+.btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── RIGHT PANEL ── */
+.response-panel {
+  background: var(--bg2); border: 1px solid var(--muted2);
+  border-radius: 14px; overflow: hidden;
+  position: sticky; top: 24px;
+}
+.response-empty { padding: 48px 24px; text-align: center; }
+.response-empty-icon { font-size: 36px; margin-bottom: 14px; opacity: 0.3; }
+.response-empty-text { font-size: 13px; color: var(--muted); line-height: 2; }
+
+.response-content { display: none; }
+.response-content.visible { display: block; }
+
+/* Stage indicator */
+.stage-bar {
+  padding: 12px 20px; border-bottom: 1px solid var(--muted2);
+  display: flex; align-items: center; gap: 8px;
+}
+.stage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber2); flex-shrink: 0; }
+.stage-label { font-size: 10px; letter-spacing: 2px; color: var(--amber2); font-weight: 700; text-transform: uppercase; }
+
+/* Loading */
+.loading-bar { height: 2px; background: var(--muted2); position: relative; overflow: hidden; display: none; }
+.loading-bar.active { display: block; }
+.loading-bar::after {
+  content: ''; position: absolute; top: 0; left: -60%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, var(--amber2), transparent);
+  animation: sweep 1s infinite;
+}
+@keyframes sweep { to { left: 120%; } }
+
+/* Response body */
+.response-body {
+  padding: 18px 20px; max-height: 500px; overflow-y: auto; font-size: 13.5px; line-height: 1.95;
+  color: rgba(255,255,254,0.82);
+}
+.response-body::-webkit-scrollbar { width: 3px; }
+.response-body::-webkit-scrollbar-thumb { background: var(--muted2); border-radius: 2px; }
+
+.response-body .highlight {
+  background: rgba(232,169,48,0.12); border-left: 3px solid var(--amber);
+  padding: 8px 12px; border-radius: 0 6px 6px 0; margin: 8px 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--amber2);
+}
+.response-body .insight {
+  background: rgba(44,181,160,0.08); border-left: 3px solid var(--teal);
+  padding: 8px 12px; border-radius: 0 6px 6px 0; margin: 8px 0;
+  font-size: 13px; color: rgba(255,255,254,0.75);
+}
+.response-body .warning {
+  background: rgba(224,92,92,0.08); border-left: 3px solid var(--red);
+  padding: 8px 12px; border-radius: 0 6px 6px 0; margin: 8px 0;
+  font-size: 13px;
+}
+.response-body .story-box {
+  background: rgba(232,169,48,0.06); border: 1px solid rgba(232,169,48,0.15);
+  border-radius: 8px; padding: 12px 14px; margin: 10px 0;
+  font-size: 12.5px; color: rgba(255,255,254,0.65);
+}
+.response-body .story-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: var(--amber2); margin-bottom: 5px; text-transform: uppercase; }
+.response-body h4 { font-size: 12px; font-weight: 700; color: var(--amber2); letter-spacing: 1px; margin: 14px 0 5px; text-transform: uppercase; }
+.response-body p { margin-bottom: 8px; }
+
+/* Follow-up chat */
+.followup {
+  padding: 14px 20px; border-top: 1px solid var(--muted2);
+}
+.followup-label { font-size: 10px; letter-spacing: 2px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 7px; }
+.followup-row { display: flex; gap: 8px; }
+.followup-input {
+  flex: 1; padding: 8px 12px; background: var(--bg3);
+  border: 1px solid var(--muted2); border-radius: 6px;
+  color: var(--paper); font-size: 13px; outline: none; font-family: 'Noto Sans SC', sans-serif;
+  transition: border-color 0.2s;
+}
+.followup-input:focus { border-color: rgba(44,181,160,0.4); }
+.followup-btn {
+  padding: 8px 14px; background: var(--teal); border: none;
+  border-radius: 6px; color: white; font-size: 13px; font-weight: 700; cursor: pointer;
+  transition: background 0.2s; font-family: 'Noto Sans SC', sans-serif;
+}
+.followup-btn:hover { background: var(--teal2); color: var(--bg); }
+.followup-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.chat-msg {
+  margin: 6px 0; padding: 8px 12px; border-radius: 7px;
+  font-size: 12.5px; line-height: 1.75;
+}
+.chat-user { background: var(--bg3); color: var(--muted); border: 1px solid var(--muted2); }
+.chat-user::before { content: '你 · '; font-weight: 700; color: var(--paper); }
+.chat-ai { background: rgba(44,181,160,0.07); color: rgba(255,255,254,0.75); border: 1px solid rgba(44,181,160,0.15); }
+.chat-ai::before { content: '侦探 · '; font-weight: 700; color: var(--teal2); }
+
+/* Number line visual */
+.numberline-box {
+  background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 8px; padding: 16px; margin: 10px 0; text-align: center;
+}
+.numberline-title { font-size: 10px; letter-spacing: 2px; color: var(--teal2); font-weight: 700; margin-bottom: 10px; text-transform: uppercase; }
+#numberline-svg { width: 100%; height: 60px; }
+
+/* ── CONCEPT TAB specific ── */
+.concept-display { display: none; }
+.concept-display.active { display: block; }
+.layer-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.layer-tab {
+  flex: 1; padding: 7px; background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 6px; color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-align: center;
+}
+.layer-tab.active { background: rgba(44,181,160,0.1); border-color: rgba(61,217,193,0.3); color: var(--teal2); }
+.layer-content { display: none; }
+.layer-content.active { display: block; }
+
+/* Visual layer — SVG interactive diagrams */
+.visual-diagram {
+  background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 10px; padding: 16px; margin-bottom: 10px;
+}
+.visual-title {
+  font-size: 10px; letter-spacing: 2px; color: var(--teal2);
+  font-weight: 700; text-transform: uppercase; margin-bottom: 10px;
+}
+.visual-diagram svg { width: 100%; display: block; }
+.visual-controls { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.visual-btn {
+  padding: 6px 14px; background: var(--bg2); border: 1px solid var(--muted2);
+  border-radius: 20px; color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.visual-btn:hover { color: var(--paper); border-color: rgba(255,255,254,0.2); }
+.visual-btn.active { background: rgba(44,181,160,0.12); border-color: rgba(61,217,193,0.35); color: var(--teal2); }
+.visual-caption {
+  font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 8px;
+  padding: 8px 10px; background: rgba(255,255,254,0.03); border-radius: 6px;
+}
+
+/* History layer — storybook cards */
+.story-book {
+  position: relative;
+}
+.story-card {
+  display: none; border-radius: 10px; overflow: hidden;
+  border: 1px solid var(--muted2);
+}
+.story-card.active { display: block; }
+.story-illustration {
+  width: 100%; height: 160px; position: relative; overflow: hidden;
+}
+.story-illustration svg { width: 100%; height: 100%; }
+.story-text-area { padding: 14px 16px; background: var(--bg3); }
+.story-byline {
+  font-size: 10px; letter-spacing: 2px; color: var(--amber2);
+  font-weight: 700; text-transform: uppercase; margin-bottom: 6px;
+}
+.story-headline {
+  font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700;
+  line-height: 1.4; margin-bottom: 8px; color: var(--paper);
+}
+.story-para {
+  font-size: 12.5px; color: rgba(255,255,254,0.7); line-height: 1.85;
+}
+.story-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 10px; padding: 0 2px;
+}
+.story-nav-btn {
+  padding: 6px 14px; background: var(--bg3); border: 1px solid var(--muted2);
+  border-radius: 20px; color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s;
+}
+.story-nav-btn:hover:not(:disabled) { color: var(--paper); }
+.story-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.story-dots { display: flex; gap: 5px; }
+.story-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--muted2); transition: background 0.2s;
+}
+.story-dot.active { background: var(--amber2); }
+
+/* ── Photo upload ── */
+.input-method-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.input-method-btn {
+  flex: 1; padding: 8px 10px; background: var(--bg3);
+  border: 1px solid var(--muted2); border-radius: 7px;
+  color: var(--muted); font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  transition: all 0.2s; text-align: center; letter-spacing: 0.5px;
+}
+.input-method-btn.active {
+  background: rgba(232,169,48,0.1); border-color: rgba(232,169,48,0.35); color: var(--amber2);
+}
+.input-section { display: none; }
+.input-section.active { display: block; }
+
+.upload-zone {
+  border: 2px dashed rgba(255,255,254,0.15); border-radius: 10px;
+  padding: 28px 20px; text-align: center; cursor: pointer;
+  transition: all 0.2s; position: relative; background: var(--bg3);
+}
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color: rgba(232,169,48,0.5); background: rgba(232,169,48,0.05);
+}
+.upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.upload-icon { font-size: 28px; margin-bottom: 8px; opacity: 0.5; }
+.upload-text { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.upload-text strong { color: var(--amber2); }
+
+.preview-box {
+  display: none; margin-top: 10px; border-radius: 8px; overflow: hidden;
+  border: 1px solid var(--muted2); position: relative;
+}
+.preview-box img { width: 100%; max-height: 220px; object-fit: contain; background: var(--bg3); }
+.preview-clear {
+  position: absolute; top: 6px; right: 6px;
+  background: rgba(0,0,0,0.6); border: none; border-radius: 50%;
+  width: 24px; height: 24px; color: white; cursor: pointer; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.ocr-result {
+  display: none; margin-top: 10px;
+  background: rgba(44,181,160,0.08); border: 1px solid rgba(61,217,193,0.2);
+  border-radius: 8px; padding: 12px 14px;
+}
+.ocr-label { font-size: 10px; letter-spacing: 2px; color: var(--teal2); font-weight: 700; margin-bottom: 6px; text-transform: uppercase; }
+.ocr-text { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--paper); line-height: 1.7; }
+.ocr-edit { width: 100%; background: transparent; border: none; outline: none; resize: none; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--paper); line-height: 1.7; }
+.ocr-actions { display: flex; gap: 8px; margin-top: 8px; }
+.ocr-btn {
+  padding: 6px 14px; border: none; border-radius: 6px;
+  font-family: 'Noto Sans SC', sans-serif; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+}
+.ocr-btn-confirm { background: var(--teal); color: white; }
+.ocr-btn-confirm:hover { background: var(--teal2); color: var(--bg); }
+.ocr-btn-retry { background: var(--bg3); color: var(--muted); border: 1px solid var(--muted2); }
+.ocr-btn-retry:hover { color: var(--paper); }
+
+/* Error box */
+.error-box {
+  background: rgba(224,92,92,0.1); border: 1px solid rgba(224,92,92,0.3);
+  border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--red);
+}
+
+@media(max-width:900px) {
+  .two-col { grid-template-columns: 1fr; }
+  .response-panel { position: static; }
+  header, .tabs, .main { padding-left: 20px; padding-right: 20px; }
+  .hero { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">≠</div>
+    <div>
+      <div class="logo-text">不等式侦探</div>
+      <div class="logo-sub">数学思维训练 · 一元一次不等式</div>
+    </div>
+  </div>
+  <div class="header-badge">🔍 AI 引导学习</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">初中数学 · 七年级</div>
+  <h1 class="hero-title">不只是记住变号，<br><em>理解为什么变号</em></h1>
+  <p class="hero-desc">从天平的倾斜到数轴上的领地，用直觉理解不等式——然后用它解决真实的问题。</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('guide')">🔍 解题引导</div>
+  <div class="tab" onclick="switchTab('concept')">💡 概念理解</div>
+  <div class="tab" onclick="switchTab('practice')">✏️ 练习出题</div>
+</div>
+
+<div class="main">
+
+  <!-- ══ TAB 1: GUIDE ══ -->
+  <div class="panel active" id="panel-guide">
+    <div class="two-col">
+
+      <!-- Left -->
+      <div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-dot" style="background:var(--amber2)"></div>
+            <div class="card-title">输入你的题目</div>
+          </div>
+          <div class="card-body">
+
+            <!-- Method tabs -->
+            <div class="input-method-tabs">
+              <button class="input-method-btn active" id="method-text" onclick="switchInputMethod('text')">⌨️ 文字输入</button>
+              <button class="input-method-btn" id="method-photo" onclick="switchInputMethod('photo')">📷 拍照上传</button>
+            </div>
+
+            <!-- Text input -->
+            <div class="input-section active" id="section-text">
+              <textarea class="input-area" id="guideInput"
+                placeholder="把题目粘贴进来，例如：&#10;解不等式 3 - 2x ≥ 5&#10;&#10;或者描述你卡住的地方：&#10;「我做到两边除以负数这步不知道怎么办」"></textarea>
+            </div>
+
+            <!-- Photo input -->
+            <div class="input-section" id="section-photo">
+              <div class="upload-zone" id="uploadZone"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="handleDrop(event)">
+                <input type="file" accept="image/*" capture="environment" onchange="handleFileSelect(event)" id="fileInput">
+                <div class="upload-icon">📸</div>
+                <div class="upload-text">
+                  <strong>点击拍照或选择图片</strong><br>
+                  支持手机直接拍照 · 也可以截图粘贴<br>
+                  <span style="font-size:11px;opacity:0.6">支持 JPG / PNG / HEIC</span>
+                </div>
+              </div>
+
+              <!-- Image preview -->
+              <div class="preview-box" id="previewBox">
+                <img id="previewImg" src="" alt="题目图片">
+                <button class="preview-clear" onclick="clearPhoto()">✕</button>
+              </div>
+
+              <!-- OCR result -->
+              <div class="ocr-result" id="ocrResult">
+                <div class="ocr-label">📝 识别结果（可以直接修改）</div>
+                <textarea class="ocr-edit" id="ocrText" rows="4"></textarea>
+                <div class="ocr-actions">
+                  <button class="ocr-btn ocr-btn-confirm" onclick="confirmOCR()">用这道题开始引导 →</button>
+                  <button class="ocr-btn ocr-btn-retry" onclick="retryOCR()">重新识别</button>
+                </div>
+              </div>
+
+              <!-- OCR loading -->
+              <div id="ocrLoading" style="display:none;text-align:center;padding:16px;color:var(--muted);font-size:13px">
+                🔍 正在识别题目…
+              </div>
+              <div id="ocrError" style="display:none"></div>
+
+              <!-- Paste hint -->
+              <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">
+                也可以直接 <strong style="color:var(--amber2)">Ctrl+V</strong> 粘贴截图
+              </div>
+            </div>
+
+            <button class="btn-submit" id="guideBtn" onclick="submitGuide()" style="margin-top:12px">开始引导 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="response-panel" id="guidePanel">
+        <div class="card-header">
+          <div class="card-dot" style="background:var(--amber2)"></div>
+          <div class="card-title">侦探的引导</div>
+        </div>
+        <div class="loading-bar" id="guideLoading"></div>
+
+        <div class="response-empty" id="guideEmpty">
+          <div class="response-empty-icon">🔍</div>
+          <div class="response-empty-text">输入一道不等式题目<br>侦探会一步步引导你思考<br><br><span style="font-size:11px;opacity:0.6">不会直接给答案——<br>答案是你自己推出来的</span></div>
+        </div>
+
+        <div class="response-content" id="guideContent">
+          <div class="stage-bar">
+            <div class="stage-dot"></div>
+            <div class="stage-label" id="stageLabel">分析中</div>
+          </div>
+          <div class="response-body" id="guideBody"></div>
+          <div class="followup">
+            <div class="followup-label">继续问侦探</div>
+            <div class="followup-row">
+              <input class="followup-input" id="guideFollowup"
+                placeholder="还有哪步不确定？"
+                onkeydown="if(event.key==='Enter')sendGuideFollowup()">
+              <button class="followup-btn" id="guideFollowupBtn" onclick="sendGuideFollowup()" disabled>问</button>
+            </div>
+            <div id="guideChatHistory"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 2: CONCEPT ══ -->
+  <div class="panel" id="panel-concept">
+    <div class="two-col">
+
+      <!-- Left -->
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div class="card-dot" style="background:var(--teal2)"></div>
+            <div class="card-title">选择一个概念</div>
+          </div>
+          <div class="card-body">
+            <div class="concept-grid">
+              <button class="concept-btn active" onclick="selectConcept('inequality')" id="cb-inequality">
+                <span class="concept-num">01</span>不等式是什么
+              </button>
+              <button class="concept-btn" onclick="selectConcept('properties')" id="cb-properties">
+                <span class="concept-num">02</span>不等式的性质
+              </button>
+              <button class="concept-btn" onclick="selectConcept('negative')" id="cb-negative">
+                <span class="concept-num">03</span>乘负数为什么变号
+              </button>
+              <button class="concept-btn" onclick="selectConcept('solve')" id="cb-solve">
+                <span class="concept-num">04</span>解不等式的步骤
+              </button>
+              <button class="concept-btn" onclick="selectConcept('numberline')" id="cb-numberline">
+                <span class="concept-num">05</span>数轴与解集
+              </button>
+              <button class="concept-btn" onclick="selectConcept('system')" id="cb-system">
+                <span class="concept-num">06</span>不等式组
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" id="conceptDetailCard">
+          <div class="card-header">
+            <div class="card-dot" style="background:var(--teal2)"></div>
+            <div class="card-title" id="conceptCardTitle">不等式是什么</div>
+            <div class="card-tag">三层理解</div>
+          </div>
+          <div class="card-body">
+            <div class="layer-tabs">
+              <div class="layer-tab active" onclick="selectLayer('intuition')">💬 直觉层</div>
+              <div class="layer-tab" onclick="selectLayer('visual')">📐 视觉层</div>
+              <div class="layer-tab" onclick="selectLayer('history')">📖 历史层</div>
+            </div>
+            <div class="layer-content active" id="layer-intuition">
+              <div style="font-size:13.5px;line-height:1.95;color:rgba(255,255,254,0.82)" id="intuition-text">选择一个概念开始探索。</div>
+            </div>
+            <div class="layer-content" id="layer-visual">
+              <div id="visual-container"></div>
+            </div>
+            <div class="layer-content" id="layer-history">
+              <div class="story-book">
+                <div id="story-cards-container"></div>
+                <div class="story-nav" id="story-nav" style="display:none">
+                  <button class="story-nav-btn" id="story-prev" onclick="storyNav(-1)">← 上一页</button>
+                  <div class="story-dots" id="story-dots"></div>
+                  <button class="story-nav-btn" id="story-next" onclick="storyNav(1)">下一页 →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: AI deep analysis -->
+      <div class="response-panel" id="conceptPanel">
+        <div class="card-header">
+          <div class="card-dot" style="background:var(--teal2)"></div>
+          <div class="card-title">深度解析</div>
+        </div>
+        <div class="loading-bar" id="conceptLoading"></div>
+        <div class="response-empty" id="conceptEmpty">
+          <div class="response-empty-icon">💡</div>
+          <div class="response-empty-text">选择左边的一个概念<br>侦探会深度讲解<br><br><span style="font-size:11px;opacity:0.6">直觉 · 视觉 · 历史故事</span></div>
+        </div>
+        <div class="response-content" id="conceptResponse">
+          <div class="response-body" id="conceptBody"></div>
+          <div class="followup">
+            <div class="followup-label">还有疑问？</div>
+            <div class="followup-row">
+              <input class="followup-input" id="conceptFollowup"
+                placeholder="继续问……"
+                onkeydown="if(event.key==='Enter')sendConceptFollowup()">
+              <button class="followup-btn" id="conceptFollowupBtn" onclick="sendConceptFollowup()" disabled>问</button>
+            </div>
+            <div id="conceptChatHistory"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TAB 3: PRACTICE ══ -->
+  <div class="panel" id="panel-practice">
+    <div class="two-col">
+
+      <!-- Left: settings -->
+      <div>
+        <div class="card" style="margin-bottom:20px">
+          <div class="card-header">
+            <div class="card-dot" style="background:var(--red)"></div>
+            <div class="card-title">出题设置</div>
+          </div>
+          <div class="card-body">
+            <p style="font-size:12px;color:var(--muted);margin-bottom:10px">选择难度</p>
+            <div class="diff-row">
+              <button class="diff-btn active" id="diff-easy" onclick="selectDiff('easy')">基础</button>
+              <button class="diff-btn" id="diff-medium" onclick="selectDiff('medium')">进阶</button>
+              <button class="diff-btn" id="diff-hard" onclick="selectDiff('hard')">挑战</button>
+            </div>
+
+            <p style="font-size:12px;color:var(--muted);margin-bottom:10px;margin-top:14px">题型偏好</p>
+            <div class="concept-grid" style="margin-bottom:14px">
+              <button class="concept-btn active" id="type-calc" onclick="toggleType('calc',this)">
+                <span class="concept-num">计算</span>纯数字不等式
+              </button>
+              <button class="concept-btn" id="type-word" onclick="toggleType('word',this)">
+                <span class="concept-num">应用</span>生活场景应用题
+              </button>
+              <button class="concept-btn" id="type-logic" onclick="toggleType('logic',this)">
+                <span class="concept-num">逻辑</span>莫斯科风格谜题
+              </button>
+              <button class="concept-btn" id="type-system" onclick="toggleType('system',this)">
+                <span class="concept-num">组合</span>不等式组
+              </button>
+            </div>
+
+            <button class="btn-submit" onclick="generatePractice()">出题！</button>
+          </div>
+        </div>
+
+        <!-- Answer input -->
+        <div class="card" id="answerCard" style="display:none">
+          <div class="card-header">
+            <div class="card-dot" style="background:var(--red)"></div>
+            <div class="card-title">你的解题过程</div>
+          </div>
+          <div class="card-body">
+            <textarea class="input-area" id="answerInput" style="min-height:120px"
+              placeholder="写下你的解题步骤……&#10;&#10;不用只写答案，把每一步都写出来，侦探会分析你的思路。"></textarea>
+            <button class="btn-submit" style="background:linear-gradient(135deg,var(--teal),#1a8a7a);box-shadow:0 4px 16px rgba(44,181,160,0.25)"
+              onclick="submitAnswer()">提交解题过程</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right -->
+      <div class="response-panel" id="practicePanel">
+        <div class="card-header">
+          <div class="card-dot" style="background:var(--red)"></div>
+          <div class="card-title">题目 & 反馈</div>
+        </div>
+        <div class="loading-bar" id="practiceLoading"></div>
+        <div class="response-empty" id="practiceEmpty">
+          <div class="response-empty-icon">✏️</div>
+          <div class="response-empty-text">选好设置，点击出题<br>侦探会给你一道量身定制的题<br><br><span style="font-size:11px;opacity:0.6">提交解题过程后<br>获得详细的思维反馈</span></div>
+        </div>
+        <div class="response-content" id="practiceContent">
+          <div class="response-body" id="practiceBody"></div>
+          <div class="followup">
+            <div class="followup-label">还有疑问？</div>
+            <div class="followup-row">
+              <input class="followup-input" id="practiceFollowup"
+                placeholder="这步为什么这样做？"
+                onkeydown="if(event.key==='Enter')sendPracticeFollowup()">
+              <button class="followup-btn" id="practiceFollowupBtn" onclick="sendPracticeFollowup()" disabled>问</button>
+            </div>
+            <div id="practiceChatHistory"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ── State ──
+let guideHistory = [], conceptHistory = [], practiceHistory = [];
+let currentDiff = 'easy', currentTypes = new Set(['calc']);
+let currentConcept = 'inequality', currentLayer = 'intuition';
+let currentQuestion = '';
+
+const WEBHOOK = 'https://anzhi.app.n8n.cloud/webhook/writing-coach';
+
+// ── API call ──
+async function callAPI(prompt, system, history, imageBase64, imageMime) {
+  const body = { prompt, system };
+  if (history && history.length > 0) body.messages = history;
+  if (imageBase64) {
+    body.image = imageBase64;
+    body.image_mime = imageMime || 'image/jpeg';
+  }
+  const resp = await fetch(WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const data = await resp.json();
+  if (!data.result) throw new Error(JSON.stringify(data));
+  return data.result;
+}
+
+// ── Tabs ──
+function switchTab(name) {
+  const tabs = ['guide','concept','practice'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', tabs[i]===name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+// ── Format response ──
+function formatResponse(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^###\s(.+)$/gm, '<h4>$1</h4>')
+    .replace(/^##\s(.+)$/gm, '<h4>$1</h4>')
+    .replace(/💡(.*?)(\n|$)/g, '<div class="insight">💡$1</div>')
+    .replace(/⚠️(.*?)(\n|$)/g, '<div class="warning">⚠️$1</div>')
+    .replace(/📖(.*?)(\n|$)/g, '<div class="story-box"><div class="story-title">📖 数学故事</div>$1</div>')
+    .replace(/`([^`]+)`/g, '<code style="font-family:JetBrains Mono,monospace;background:rgba(255,255,254,0.08);padding:1px 5px;border-radius:3px;font-size:12px">$1</code>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>');
+}
+
+// ── INPUT METHOD ──
+let currentImageBase64 = null;
+let currentImageMime = 'image/jpeg';
+let currentInputMethod = 'text';
+
+function switchInputMethod(method) {
+  currentInputMethod = method;
+  ['text','photo'].forEach(m => {
+    document.getElementById('method-'+m).classList.toggle('active', m===method);
+    document.getElementById('section-'+m).classList.toggle('active', m===method);
+  });
+}
+
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processImageFile(file);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) processImageFile(file);
+}
+
+// Support Ctrl+V paste anywhere on photo tab
+document.addEventListener('paste', (e) => {
+  if (currentInputMethod !== 'photo') return;
+  const items = e.clipboardData?.items;
+  if (!items) return;
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      const file = item.getAsFile();
+      if (file) processImageFile(file);
+      break;
+    }
+  }
+});
+
+function processImageFile(file) {
+  currentImageMime = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    currentImageBase64 = dataUrl.split(',')[1];
+    // Show preview
+    document.getElementById('previewImg').src = dataUrl;
+    document.getElementById('previewBox').style.display = 'block';
+    document.getElementById('ocrResult').style.display = 'none';
+    document.getElementById('ocrError').style.display = 'none';
+    // Auto-run OCR
+    runOCR();
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearPhoto() {
+  currentImageBase64 = null;
+  document.getElementById('previewBox').style.display = 'none';
+  document.getElementById('ocrResult').style.display = 'none';
+  document.getElementById('ocrLoading').style.display = 'none';
+  document.getElementById('ocrError').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+}
+
+async function runOCR() {
+  document.getElementById('ocrLoading').style.display = 'block';
+  document.getElementById('ocrResult').style.display = 'none';
+  document.getElementById('ocrError').style.display = 'none';
+
+  const ocrPrompt = `请识别这张图片中的数学题目，原样输出题目文字内容。
+要求：
+- 数学符号尽量用标准文字表示，例如：≥ ≤ > < × ÷
+- 分数用 a/b 表示
+- 保留题目的完整内容，包括题号
+- 如果有多道题，每道题换行
+- 只输出题目内容，不要分析或解答`;
+
+  try {
+    const resp = await fetch(WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: ocrPrompt,
+        system: '你是一个数学题目文字识别工具，只负责准确识别图片中的题目内容，不做任何解答。',
+        image: currentImageBase64,
+        image_mime: currentImageMime
+      })
+    });
+    const data = await resp.json();
+    if (!data.result) throw new Error('识别失败');
+    document.getElementById('ocrText').value = data.result.trim();
+    document.getElementById('ocrResult').style.display = 'block';
+  } catch(e) {
+    document.getElementById('ocrError').innerHTML = `<div class="error-box" style="margin-top:10px">⚠️ 识别失败：${e.message}<br><span style="font-size:11px">请切换到文字输入手动输入题目</span></div>`;
+    document.getElementById('ocrError').style.display = 'block';
+  }
+  document.getElementById('ocrLoading').style.display = 'none';
+}
+
+function retryOCR() {
+  if (currentImageBase64) runOCR();
+}
+
+function confirmOCR() {
+  const text = document.getElementById('ocrText').value.trim();
+  if (!text) return;
+  // Switch to text mode with OCR result filled in
+  document.getElementById('guideInput').value = text;
+  switchInputMethod('text');
+  submitGuide();
+}
+
+// ── GUIDE TAB ──
+const GUIDE_SYSTEM = `你是"不等式侦探"，一个风趣、耐心、绝不直接给答案的数学思维引导者。
+你相信每个孩子都能自己想出来——你的工作是帮他找到那把钥匙。
+
+你的引导风格：
+1. 永远先问"你卡在哪一步？"而不是直接讲解
+2. 用天平类比解释不等式的平衡原理
+3. 在孩子接近"乘除负数变号"这步时，提前预警——用镜像/翻转的比喻
+4. 每完成一步，让孩子把当前结果代入数轴，看看解集在哪个方向
+5. 绝不说"错了"，只说"有意思，我们再看看这一步"
+6. 解完后要求孩子验证：把边界值代入原不等式检验
+
+格式要求：
+- 用💡标记关键洞察
+- 用⚠️标记常见陷阱（尤其是变号）
+- 引导问题用"→"开头
+- 保持简洁，每次回复不超过200字，像苏格拉底一样用问题引导`;
+
+async function submitGuide() {
+  // Determine input source
+  let input = '';
+  if (currentInputMethod === 'photo') {
+    // If OCR result available, use it; otherwise use image directly
+    const ocrText = document.getElementById('ocrText').value.trim();
+    if (ocrText) {
+      input = ocrText;
+    } else if (currentImageBase64) {
+      // No OCR yet — run it first
+      await runOCR();
+      input = document.getElementById('ocrText').value.trim();
+      if (!input) return;
+    } else {
+      return;
+    }
+  } else {
+    input = document.getElementById('guideInput').value.trim();
+  }
+  if (!input) return;
+
+  const btn = document.getElementById('guideBtn');
+  btn.disabled = true;
+  document.getElementById('guideLoading').classList.add('active');
+  document.getElementById('guideEmpty').style.display = 'none';
+  document.getElementById('guideContent').classList.add('visible');
+  document.getElementById('stageLabel').textContent = '分析题目中';
+
+  const prompt = `学生输入：${input}\n\n请先判断这是一道需要解题引导的题目，还是学生在描述自己的困惑。然后开始你的苏格拉底式引导。`;
+  guideHistory = [{ role: 'user', content: prompt }];
+
+  try {
+    const resp = await callAPI(prompt, GUIDE_SYSTEM);
+    guideHistory.push({ role: 'assistant', content: resp });
+    document.getElementById('stageLabel').textContent = '引导进行中';
+    document.getElementById('guideBody').innerHTML = '<p>' + formatResponse(resp) + '</p>';
+    document.getElementById('guideFollowupBtn').disabled = false;
+  } catch(e) {
+    document.getElementById('guideBody').innerHTML = `<div class="error-box">⚠️ 连接失败：${e.message}</div>`;
+  }
+
+  btn.disabled = false;
+  document.getElementById('guideLoading').classList.remove('active');
+}
+
+async function sendGuideFollowup() {
+  const input = document.getElementById('guideFollowup');
+  const q = input.value.trim(); if (!q) return;
+  const chat = document.getElementById('guideChatHistory');
+  chat.innerHTML += `<div class="chat-msg chat-user">${q}</div>`;
+  input.value = '';
+  document.getElementById('guideFollowupBtn').disabled = true;
+  guideHistory.push({ role: 'user', content: q });
+  try {
+    const resp = await callAPI(q, GUIDE_SYSTEM, guideHistory);
+    guideHistory.push({ role: 'assistant', content: resp });
+    chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  } catch(e) {
+    chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
+  }
+  document.getElementById('guideFollowupBtn').disabled = false;
+}
+
+// ── CONCEPT TAB ──
+const CONCEPT_SYSTEM = `你是"不等式侦探"，深度讲解数学概念。
+语言亲切，像和好奇的13岁学生聊天。
+包含：一个引发思考的核心问题、最常见的错误理解、一道检验理解的思考题。
+用💡标记洞察，用⚠️标记陷阱。200字以内。`;
+
+// ── Intuition text content ──
+const INTUITION = {
+  inequality: `想象一个天平。<strong>等式</strong>是天平完美平衡——左边 = 右边。<strong>不等式</strong>是天平<em>倾斜</em>的状态：一边比另一边重。<br><br>不等式不是描述"相等"，而是描述<strong>大小关系</strong>——谁多谁少，多多少。<br><br>💡 → 如果天平左边比右边重5克，你会用什么符号描述这个关系？`,
+  properties: `不等式的四条性质，就是天平的操作规则：<br><br><strong>① 加减：</strong>两边同时加/减同一个数 → 大小关系不变<br><strong>② 乘除正数：</strong>两边同时×或÷正数 → 大小关系不变<br><strong>③ 乘除负数：</strong>两边同时×或÷负数 → 大小关系<strong>反转！</strong><br><strong>④ 传递性：</strong>A > B 且 B > C，则 A > C<br><br>⚠️ 第③条是最多人忘记的陷阱。`,
+  negative: `这是所有同学最困惑的地方！<br><br>想象你站在数轴0点，面朝正方向。3在你右边，5在更右边，所以 <strong>3 < 5</strong>。<br><br>乘以 -1，就像把整个数轴<strong>翻转180°</strong>。右边的3跑到左边变成-3，更右的5跑到更左变成-5。<br><br>💡 "更右"变成了"更左"，大小关系自然反转。这不是规定，是<em>必然结果</em>！`,
+  solve: `解不等式的步骤和方程几乎一样，只有一个额外规则：<strong>遇到乘除负数要变号</strong>。<br><br>① 去分母 → ② 去括号 → ③ 移项 → ④ 合并同类项 → ⑤ 系数化1（⚠️除负数变号！）→ ⑥ 画数轴验证<br><br>💡 诀窍：把解不等式想象成"给x减负"——把它从一堆数字的包围中解救出来，单独站到不等号一边。`,
+  numberline: `解集就是所有让不等式成立的x的集合。数轴让它变得可见：<br><br>• <strong>x > a</strong>：a处空心圆 ○，向右箭头 →<br>• <strong>x ≥ a</strong>：a处实心圆 ●，向右箭头 →<br>• <strong>x < a</strong>：a处空心圆 ○，向左箭头 ←<br>• <strong>x ≤ a</strong>：a处实心圆 ●，向左箭头 ←<br><br>💡 空心=不包含边界，实心=包含边界。这个细节在考试里经常丢分！`,
+  system: `不等式组 = 多个条件同时成立。就像买东西的限制条件：<br><br>💰 "价格不超过100元" 且 "价格超过50元"<br>→ 50 < 价格 ≤ 100<br><br>解不等式组的步骤：<br>① 分别解每个不等式<br>② 在数轴上画出各自的解集<br>③ 找重叠部分（交集）就是答案<br><br>⚠️ 如果两段没有重叠 → 无解。`
+};
+
+// ── SVG Visual Diagrams ──
+const VISUALS = {
+  inequality: {
+    title: '天平 vs 等式',
+    render: () => `
+      <div class="visual-diagram">
+        <div class="visual-title">互动演示：等式 vs 不等式</div>
+        <svg viewBox="0 0 360 140" xmlns="http://www.w3.org/2000/svg" id="svg-inequality">
+          <!-- Base -->
+          <line x1="180" y1="120" x2="180" y2="50" stroke="#555" stroke-width="2"/>
+          <circle cx="180" cy="125" r="6" fill="#555"/>
+          <!-- Beam - starts balanced -->
+          <line id="beam" x1="80" y1="55" x2="280" y2="55" stroke="#e8a930" stroke-width="3" stroke-linecap="round"/>
+          <!-- Left pan -->
+          <line id="lrope" x1="100" y1="55" x2="100" y2="80" stroke="#888" stroke-width="1.5"/>
+          <rect id="lpan" x="72" y="80" width="56" height="5" rx="2" fill="#2cb5a0"/>
+          <!-- Right pan -->
+          <line id="rrope" x1="260" y1="55" x2="260" y2="80" stroke="#888" stroke-width="1.5"/>
+          <rect id="rpan" x="232" y="80" width="56" height="5" rx="2" fill="#2cb5a0"/>
+          <!-- Weights (left) -->
+          <rect id="lw1" x="82" y="62" width="22" height="18" rx="3" fill="#e05c5c" opacity="0.9"/>
+          <text x="93" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="bold">3x</text>
+          <!-- Weights (right) -->
+          <rect id="rw1" x="243" y="62" width="22" height="18" rx="3" fill="#7d3c98" opacity="0.9"/>
+          <text x="254" y="75" text-anchor="middle" fill="white" font-size="10" font-weight="bold">9</text>
+          <!-- Labels -->
+          <text id="balance-label" x="180" y="18" text-anchor="middle" fill="#f5c842" font-size="12" font-weight="bold">等式：3x = 9，天平平衡</text>
+          <text x="100" y="100" text-anchor="middle" fill="#aaa" font-size="9">左边</text>
+          <text x="260" y="100" text-anchor="middle" fill="#aaa" font-size="9">右边</text>
+          <!-- Symbol -->
+          <text id="sym" x="180" y="45" text-anchor="middle" fill="#f5c842" font-size="18" font-weight="bold">=</text>
+        </svg>
+        <div class="visual-controls">
+          <button class="visual-btn active" onclick="setBalance('equal')">= 等式</button>
+          <button class="visual-btn" onclick="setBalance('greater')">左 > 右</button>
+          <button class="visual-btn" onclick="setBalance('less')">左 < 右</button>
+        </div>
+        <div class="visual-caption" id="balance-caption">天平平衡代表等式。点击按钮，观察不等式时天平如何倾斜。</div>
+      </div>`,
+    init: () => { window.setBalance = setBalance; }
+  },
+  properties: {
+    title: '不等式性质演示',
+    render: () => `
+      <div class="visual-diagram">
+        <div class="visual-title">性质③：乘以负数为什么要变号</div>
+        <svg viewBox="0 0 360 110" xmlns="http://www.w3.org/2000/svg">
+          <!-- Number line 1: before -->
+          <text x="10" y="25" fill="#aaa" font-size="10">原来：</text>
+          <line x1="40" y1="35" x2="340" y2="35" stroke="#444" stroke-width="1.5"/>
+          <line x1="340" y1="32" x2="340" y2="38" stroke="#888" stroke-width="1.5"/>
+          <!-- ticks -->
+          <line x1="100" y1="30" x2="100" y2="40" stroke="#666" stroke-width="1"/>
+          <line x1="160" y1="30" x2="160" y2="40" stroke="#666" stroke-width="1"/>
+          <line x1="220" y1="30" x2="220" y2="40" stroke="#666" stroke-width="1"/>
+          <line x1="280" y1="30" x2="280" y2="40" stroke="#666" stroke-width="1"/>
+          <text x="100" y="52" text-anchor="middle" fill="#888" font-size="9">-2</text>
+          <text x="160" y="52" text-anchor="middle" fill="#888" font-size="9">0</text>
+          <text x="220" y="52" text-anchor="middle" fill="#888" font-size="9">2</text>
+          <text x="280" y="52" text-anchor="middle" fill="#888" font-size="9">4</text>
+          <!-- Points A=1 and B=3 -->
+          <circle cx="190" cy="35" r="5" fill="#e8a930"/>
+          <text x="190" y="27" text-anchor="middle" fill="#f5c842" font-size="10" font-weight="bold">1</text>
+          <circle cx="250" cy="35" r="5" fill="#e05c5c"/>
+          <text x="250" y="27" text-anchor="middle" fill="#e05c5c" font-size="10" font-weight="bold">3</text>
+          <text x="220" y="18" text-anchor="middle" fill="#aaa" font-size="9">1 &lt; 3 ✓</text>
+
+          <!-- Arrow showing flip -->
+          <text x="180" y="72" text-anchor="middle" fill="#3dd9c1" font-size="11" font-weight="bold">× (-1) → 翻转！</text>
+
+          <!-- Number line 2: after -->
+          <text x="10" y="88" fill="#aaa" font-size="10">翻转后：</text>
+          <line x1="40" y1="95" x2="340" y2="95" stroke="#444" stroke-width="1.5"/>
+          <line x1="340" y1="92" x2="340" y2="98" stroke="#888" stroke-width="1.5"/>
+          <line x1="100" y1="90" x2="100" y2="100" stroke="#666" stroke-width="1"/>
+          <line x1="160" y1="90" x2="160" y2="100" stroke="#666" stroke-width="1"/>
+          <line x1="220" y1="90" x2="220" y2="100" stroke="#666" stroke-width="1"/>
+          <line x1="280" y1="90" x2="280" y2="100" stroke="#666" stroke-width="1"/>
+          <text x="100" y="108" text-anchor="middle" fill="#888" font-size="9">-4</text>
+          <text x="160" y="108" text-anchor="middle" fill="#888" font-size="9">-2</text>
+          <text x="220" y="108" text-anchor="middle" fill="#888" font-size="9">0</text>
+          <text x="280" y="108" text-anchor="middle" fill="#888" font-size="9">2</text>
+          <!-- -1 and -3 after flip -->
+          <circle cx="190" cy="95" r="5" fill="#e8a930"/>
+          <text x="190" y="87" text-anchor="middle" fill="#f5c842" font-size="10" font-weight="bold">-1</text>
+          <circle cx="130" cy="95" r="5" fill="#e05c5c"/>
+          <text x="130" y="87" text-anchor="middle" fill="#e05c5c" font-size="10" font-weight="bold">-3</text>
+          <text x="160" y="80" text-anchor="middle" fill="#3dd9c1" font-size="9">-1 &gt; -3 （变号！）✓</text>
+        </svg>
+        <div class="visual-caption">黄点1翻转成-1，红点3翻转成-3。原来1在3左边，翻转后-1在-3右边——方向完全对调。</div>
+      </div>`,
+    init: () => {}
+  },
+  negative: {
+    title: '翻转动画',
+    render: () => `
+      <div class="visual-diagram">
+        <div class="visual-title">互动：数轴翻转演示</div>
+        <svg viewBox="0 0 360 80" xmlns="http://www.w3.org/2000/svg" id="flip-svg">
+          <line x1="20" y1="40" x2="340" y2="40" stroke="#444" stroke-width="1.5"/>
+          <line x1="340" y1="37" x2="340" y2="43" stroke="#888"/>
+          <!-- 0 marker -->
+          <line x1="180" y1="33" x2="180" y2="47" stroke="#888" stroke-width="2"/>
+          <text x="180" y="58" text-anchor="middle" fill="#888" font-size="10">0</text>
+          <!-- Dynamic points rendered by JS -->
+          <circle id="pt-a" cx="230" cy="40" r="7" fill="#e8a930"/>
+          <text id="lbl-a" x="230" y="35" text-anchor="middle" fill="#f5c842" font-size="11" font-weight="bold">2</text>
+          <circle id="pt-b" cx="290" cy="40" r="7" fill="#e05c5c"/>
+          <text id="lbl-b" x="290" y="35" text-anchor="middle" fill="#e05c5c" font-size="11" font-weight="bold">5</text>
+          <text id="flip-rel" x="260" y="22" text-anchor="middle" fill="#aaa" font-size="10">2 &lt; 5</text>
+          <text id="flip-status" x="180" y="72" text-anchor="middle" fill="#3dd9c1" font-size="11"></text>
+        </svg>
+        <div class="visual-controls">
+          <button class="visual-btn active" id="flip-btn-orig" onclick="flipAxis(1)">× 1（原始）</button>
+          <button class="visual-btn" id="flip-btn-neg1" onclick="flipAxis(-1)">× (-1) 翻转</button>
+          <button class="visual-btn" id="flip-btn-neg2" onclick="flipAxis(-2)">× (-2)</button>
+        </div>
+        <div class="visual-caption" id="flip-caption">点击按钮，看两个点如何随乘法翻转位置，以及大小关系如何变化。</div>
+      </div>`,
+    init: () => { initFlipAxis(); }
+  },
+  solve: {
+    title: '解题步骤动画',
+    render: () => `
+      <div class="visual-diagram">
+        <div class="visual-title">逐步演示：解 3 − 2x ≥ 5</div>
+        <div id="solve-steps"></div>
+        <div class="visual-controls">
+          <button class="visual-btn" id="solve-prev-btn" onclick="solveStep(-1)" disabled>← 上一步</button>
+          <button class="visual-btn active" id="solve-next-btn" onclick="solveStep(1)">下一步 →</button>
+          <button class="visual-btn" onclick="solveReset()">重置</button>
+        </div>
+        <div class="visual-caption" id="solve-caption">点击"下一步"，逐步解这道不等式，每一步都有说明。</div>
+      </div>`,
+    init: () => { initSolveSteps(); }
+  },
+  numberline: {
+    title: '数轴解集互动',
+    render: () => `
+      <div class="visual-diagram">
+        <div class="visual-title">互动数轴：拖动边界值，观察解集变化</div>
+        <svg viewBox="0 0 360 90" xmlns="http://www.w3.org/2000/svg" id="nl-svg">
+          <!-- Axis -->
+          <line x1="30" y1="50" x2="330" y2="50" stroke="#444" stroke-width="1.5"/>
+          <line x1="330" y1="46" x2="330" y2="54" stroke="#888"/>
+          <line x1="30" y1="46" x2="30" y2="54" stroke="#888"/>
+          <!-- Ticks -->
+          <line x1="80" y1="44" x2="80" y2="56" stroke="#555" stroke-width="1"/>
+          <line x1="130" y1="44" x2="130" y2="56" stroke="#555" stroke-width="1"/>
+          <line x1="180" y1="44" x2="180" y2="56" stroke="#666" stroke-width="2"/>
+          <line x1="230" y1="44" x2="230" y2="56" stroke="#555" stroke-width="1"/>
+          <line x1="280" y1="44" x2="280" y2="56" stroke="#555" stroke-width="1"/>
+          <text x="80" y="68" text-anchor="middle" fill="#666" font-size="9">-4</text>
+          <text x="130" y="68" text-anchor="middle" fill="#666" font-size="9">-2</text>
+          <text x="180" y="68" text-anchor="middle" fill="#888" font-size="10" font-weight="bold">0</text>
+          <text x="230" y="68" text-anchor="middle" fill="#666" font-size="9">2</text>
+          <text x="280" y="68" text-anchor="middle" fill="#666" font-size="9">4</text>
+          <!-- Solution set highlight -->
+          <rect id="nl-fill" x="230" y="43" width="100" height="14" rx="3" fill="rgba(44,181,160,0.3)"/>
+          <!-- Boundary circle -->
+          <circle id="nl-circle" cx="230" cy="50" r="6" fill="none" stroke="#3dd9c1" stroke-width="2.5"/>
+          <!-- Arrow -->
+          <line id="nl-arrow" x1="236" y1="50" x2="320" y2="50" stroke="#3dd9c1" stroke-width="2.5"/>
+          <polygon id="nl-arrowhead" points="320,46 330,50 320,54" fill="#3dd9c1"/>
+          <!-- Boundary label -->
+          <text id="nl-label" x="230" y="36" text-anchor="middle" fill="#3dd9c1" font-size="11" font-weight="bold">2</text>
+          <text id="nl-expr" x="180" y="20" text-anchor="middle" fill="#f5c842" font-size="12" font-weight="bold">x &gt; 2</text>
+        </svg>
+        <div class="visual-controls">
+          <button class="visual-btn active" onclick="setNL('gt2')">x &gt; 2</button>
+          <button class="visual-btn" onclick="setNL('gte2')">x ≥ 2</button>
+          <button class="visual-btn" onclick="setNL('lt-1')">x &lt; -1</button>
+          <button class="visual-btn" onclick="setNL('lte-1')">x ≤ -1</button>
+          <button class="visual-btn" onclick="setNL('range')">-1 &lt; x ≤ 3</button>
+        </div>
+        <div class="visual-caption" id="nl-caption">观察空心圆（不含）和实心圆（含）的区别，以及箭头方向。</div>
+      </div>`,
+    init: () => { initNumberLine(); }
+  },
+  system: {
+    title: '不等式组数轴',
+    render: () => `
+      <div class="visual-diagram">
+        <div class="visual-title">不等式组：两个解集的交集</div>
+        <svg viewBox="0 0 360 130" xmlns="http://www.w3.org/2000/svg" id="sys-svg">
+          <text x="10" y="28" fill="#aaa" font-size="10">① x&gt;-1</text>
+          <line x1="60" y1="30" x2="340" y2="30" stroke="#444" stroke-width="1.5"/>
+          <line x1="100" y1="25" x2="100" y2="35" stroke="#555"/><line x1="160" y1="25" x2="160" y2="35" stroke="#555"/>
+          <line x1="220" y1="25" x2="220" y2="35" stroke="#555"/><line x1="280" y1="25" x2="280" y2="35" stroke="#555"/>
+          <text x="160" y="45" text-anchor="middle" fill="#888" font-size="9">-1</text>
+          <text x="220" y="45" text-anchor="middle" fill="#555" font-size="8">1</text>
+          <text x="280" y="45" text-anchor="middle" fill="#555" font-size="8">3</text>
+          <rect x="163" y="23" width="177" height="14" rx="3" fill="rgba(232,169,48,0.25)"/>
+          <circle cx="160" cy="30" r="5" fill="none" stroke="#e8a930" stroke-width="2"/>
+          <line x1="165" y1="30" x2="335" y2="30" stroke="#e8a930" stroke-width="2"/>
+          <text x="10" y="78" fill="#aaa" font-size="10">② x≤3</text>
+          <line x1="60" y1="80" x2="340" y2="80" stroke="#444" stroke-width="1.5"/>
+          <line x1="160" y1="75" x2="160" y2="85" stroke="#555"/><line x1="220" y1="75" x2="220" y2="85" stroke="#555"/>
+          <line x1="280" y1="75" x2="280" y2="85" stroke="#555"/>
+          <text x="160" y="95" text-anchor="middle" fill="#555" font-size="8">-1</text>
+          <text x="220" y="95" text-anchor="middle" fill="#555" font-size="8">1</text>
+          <text x="280" y="95" text-anchor="middle" fill="#888" font-size="9">3</text>
+          <rect x="60" y="73" width="223" height="14" rx="3" fill="rgba(44,181,160,0.25)"/>
+          <circle cx="280" cy="80" r="5" fill="#2cb5a0" stroke="#3dd9c1" stroke-width="2"/>
+          <line x1="65" y1="80" x2="275" y2="80" stroke="#2cb5a0" stroke-width="2"/>
+          <text x="180" y="115" text-anchor="middle" fill="#f5c842" font-size="11" font-weight="bold">交集：-1 &lt; x ≤ 3</text>
+          <line x1="160" y1="111" x2="283" y2="111" stroke="#f5c842" stroke-width="2.5"/>
+          <circle cx="160" cy="111" r="4" fill="none" stroke="#f5c842" stroke-width="2"/>
+          <circle cx="280" cy="111" r="4" fill="#f5c842"/>
+        </svg>
+        <div class="visual-controls">
+          <button class="visual-btn active" onclick="setSysExample('overlap',this)">有交集</button>
+          <button class="visual-btn" onclick="setSysExample('nooverlap',this)">无交集（无解）</button>
+          <button class="visual-btn" onclick="setSysExample('subset',this)">一方包含另一方</button>
+        </div>
+        <div class="visual-caption" id="sys-caption">黄色是最终解集——两个解集重叠的部分。</div>
+      </div>`,
+    init: () => { initSystemExamples(); }
+  }
+};
+
+// ── Story content (storybook cards) ──
+const STORIES = {
+  inequality: [
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#1a2535"/>
+        <circle cx="40" cy="20" r="1.5" fill="#f5c842" opacity="0.7"/><circle cx="120" cy="10" r="1" fill="#f5c842" opacity="0.5"/>
+        <circle cx="300" cy="15" r="2" fill="#f5c842" opacity="0.8"/>
+        <rect x="80" y="110" width="200" height="8" rx="2" fill="#8a7560"/>
+        <rect x="90" y="85" width="8" height="25" fill="#a08870"/><rect x="140" y="85" width="8" height="25" fill="#a08870"/>
+        <rect x="190" y="85" width="8" height="25" fill="#a08870"/><rect x="240" y="85" width="8" height="25" fill="#a08870"/>
+        <rect x="75" y="78" width="210" height="10" rx="2" fill="#c4a882"/>
+        <circle cx="290" cy="60" r="10" fill="#e8c88a"/>
+        <line x1="290" y1="70" x2="290" y2="100" stroke="#c49a6a" stroke-width="3"/>
+        <line x1="290" y1="80" x2="275" y2="92" stroke="#c49a6a" stroke-width="2"/>
+        <line x1="290" y1="80" x2="305" y2="88" stroke="#c49a6a" stroke-width="2"/>
+        <rect x="302" y="84" width="18" height="14" rx="2" fill="#f5e8c0"/>
+        <text x="311" y="94" text-anchor="middle" fill="#8a6030" font-size="9" font-weight="bold">&gt;</text>
+        <text x="180" y="148" text-anchor="middle" fill="#e8a930" font-size="11" font-weight="bold">公元1631年，英格兰</text>
+      </svg>`,
+      byline: '符号的诞生', headline: '那个第一次写下">"的人',
+      para: '1631年，英国数学家托马斯·哈里奥特出版了一本代数书，第一次用">"和"<"符号表示大小关系。在他之前，人们要写一整句话："左边的量大于右边的量"。哈里奥特把这句话压缩成一个符号——这个小小的创造，让数学从此简洁了许多。'
+    },
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#1a2030"/>
+        <rect x="60" y="20" width="240" height="120" rx="8" fill="#2a1a0a" opacity="0.8"/>
+        <rect x="65" y="25" width="230" height="110" rx="6" fill="#3d2810"/>
+        <text x="100" y="70" fill="#c49a50" font-size="18" opacity="0.6">九</text>
+        <text x="140" y="70" fill="#c49a50" font-size="18" opacity="0.6">章</text>
+        <text x="180" y="70" fill="#c49a50" font-size="18" opacity="0.6">算</text>
+        <text x="220" y="70" fill="#c49a50" font-size="18" opacity="0.6">術</text>
+        <line x1="90" y1="90" x2="270" y2="90" stroke="#8b1a1a" stroke-width="1.5" opacity="0.4"/>
+        <text x="180" y="145" text-anchor="middle" fill="#3dd9c1" font-size="11" font-weight="bold">约公元200年，中国</text>
+      </svg>`,
+      byline: '东方的先驱', headline: '《九章算术》里的不等思想',
+      para: '早在公元200年前后，中国数学经典《九章算术》就包含了大量不等关系的实际应用——粮食分配"不超过某量"、赋税"不少于某数"。虽然没有用现代符号，但不等式的思想已经在解决真实的农业和经济问题。东西方数学在不同的道路上，独立地发展出了同一种思维。'
+    }
+  ],
+  negative: [
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#1a1030"/>
+        <rect x="130" y="15" width="100" height="130" rx="8" fill="#2a1a40"/>
+        <rect x="135" y="20" width="90" height="120" rx="6" fill="#1a1030" stroke="#7d3c98" stroke-width="2"/>
+        <circle cx="80" cy="55" r="12" fill="#e8a930" opacity="0.9"/>
+        <line x1="80" y1="67" x2="80" y2="100" stroke="#e8a930" stroke-width="3"/>
+        <line x1="80" y1="78" x2="65" y2="90" stroke="#e8a930" stroke-width="2"/>
+        <line x1="80" y1="78" x2="95" y2="90" stroke="#e8a930" stroke-width="2"/>
+        <text x="80" y="118" text-anchor="middle" fill="#e8a930" font-size="9">+3</text>
+        <circle cx="280" cy="55" r="12" fill="#e8a930" opacity="0.5"/>
+        <line x1="280" y1="67" x2="280" y2="100" stroke="#e8a930" stroke-width="3" opacity="0.5"/>
+        <text x="280" y="118" text-anchor="middle" fill="#e05c5c" font-size="9">-3</text>
+        <line x1="180" y1="15" x2="180" y2="145" stroke="#7d3c98" stroke-width="1.5" stroke-dasharray="4,3"/>
+        <text x="180" y="140" text-anchor="middle" fill="#7d3c98" font-size="9">镜像轴 (×-1)</text>
+      </svg>`,
+      byline: '负数的漫长旅程', headline: '"荒谬的数"——负数被拒绝的1000年',
+      para: '难以置信，但这是真的：欧洲数学家用了将近1000年才接受负数。16世纪，法国数学家韦达仍然把负数称为"荒谬的量"并拒绝使用。中国《九章算术》约2000年前就用"负"表示债务，比欧洲早了1500年以上。当人们终于接受负数，乘负数变号就不再是神秘规定——它是数轴镜像翻转的必然结果。'
+    }
+  ],
+  properties: [
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#1a2010"/>
+        <ellipse cx="180" cy="155" rx="200" ry="30" fill="#2a1a05"/>
+        <ellipse cx="120" cy="110" rx="35" ry="25" fill="#3d6b5a"/><rect x="85" y="110" width="70" height="40" fill="#3d6b5a"/>
+        <rect x="290" y="75" width="14" height="75" fill="#5a4a2a"/>
+        <polygon points="297,65 287,80 307,80" fill="#8a6a3a"/>
+        <circle cx="175" cy="68" r="10" fill="#e8c88a"/>
+        <rect x="165" y="78" width="20" height="30" rx="5" fill="#2a5a4a"/>
+        <rect x="155" y="88" width="40" height="5" rx="2" fill="#f5e8c0"/>
+        <text x="180" y="148" text-anchor="middle" fill="#e8a930" font-size="11" font-weight="bold">《九章算术》，约公元前200年</text>
+      </svg>`,
+      byline: '最古老的不等式应用', headline: '古代官员的数学难题',
+      para: '《九章算术》记载了大量不等关系的实际问题：粮食分配"不少于某量"，税赋"不超过某比例"。这些问题驱动了不等式思想的早期发展。古代的税务官和粮食官员，在不知道"不等式"这个词的情况下，每天都在使用不等式逻辑来管理国家。'
+    }
+  ],
+  solve: [
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#1a2020"/>
+        <ellipse cx="180" cy="155" rx="200" ry="30" fill="#2a1a05"/>
+        <ellipse cx="120" cy="110" rx="35" ry="25" fill="#3d6b5a"/><rect x="85" y="110" width="70" height="40" fill="#3d6b5a"/>
+        <ellipse cx="240" cy="115" rx="25" ry="18" fill="#4a7a68"/><rect x="215" y="115" width="50" height="40" fill="#4a7a68"/>
+        <rect x="290" y="75" width="14" height="75" fill="#5a4a2a"/>
+        <circle cx="175" cy="68" r="10" fill="#e8c88a"/>
+        <rect x="165" y="78" width="20" height="30" rx="5" fill="#2a5a4a"/>
+        <rect x="155" y="88" width="40" height="5" rx="2" fill="#f5e8c0"/>
+        <text x="175" y="93" text-anchor="middle" fill="#8a6030" font-size="7">al-jabr</text>
+        <text x="180" y="148" text-anchor="middle" fill="#2cb5a0" font-size="11" font-weight="bold">公元820年，巴格达</text>
+      </svg>`,
+      byline: '代数的起源', headline: 'al-Khwarizmi 和他改变世界的一本书',
+      para: '公元820年，巴格达智慧宫里，数学家花拉子米写下了一本书，书名里的"al-jabr"（移项）给了我们"Algebra（代数）"这个词。他的核心思想——把未知量隔离到等式一边——1200年后仍然是解方程和不等式的基本方法。你每次移项，就是在重走他的路。'
+    }
+  ],
+  numberline: [
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#151525"/>
+        <line x1="180" y1="10" x2="180" y2="150" stroke="#2a2a4a" stroke-width="1"/>
+        <line x1="20" y1="80" x2="340" y2="80" stroke="#2a2a4a" stroke-width="1"/>
+        <line x1="180" y1="15" x2="180" y2="145" stroke="#7d3c98" stroke-width="2"/>
+        <line x1="25" y1="80" x2="335" y2="80" stroke="#7d3c98" stroke-width="2"/>
+        <polygon points="180,12 175,22 185,22" fill="#7d3c98"/>
+        <polygon points="338,80 328,75 328,85" fill="#7d3c98"/>
+        <circle cx="100" cy="45" r="12" fill="#e8c88a"/>
+        <rect x="88" y="57" width="24" height="32" rx="4" fill="#3a2a5a"/>
+        <circle cx="230" cy="50" r="5" fill="#e8a930"/>
+        <line x1="230" y1="50" x2="230" y2="80" stroke="#e8a930" stroke-width="1" stroke-dasharray="3,2" opacity="0.5"/>
+        <text x="155" y="32" fill="#c49af0" font-size="8">(x, y)</text>
+        <text x="180" y="148" text-anchor="middle" fill="#7d3c98" font-size="11" font-weight="bold">1637年，法国</text>
+      </svg>`,
+      byline: '坐标系的发明', headline: '笛卡尔如何让代数"看得见"',
+      para: '1637年，法国哲学家笛卡尔发明了坐标系。他的想法简单而深刻：给每个数字一个位置，让抽象的量变成可见的点。数轴是一维坐标系——每个位置对应一个数。这个发明让代数和几何第一次融合，解不等式的解集从此可以在数轴上直观地"看"到。'
+    }
+  ],
+  system: [
+    {
+      illustration: `<svg viewBox="0 0 360 160" xmlns="http://www.w3.org/2000/svg"><rect width="360" height="160" fill="#101a20"/>
+        <circle cx="80" cy="50" r="15" fill="#1a3a4a" stroke="#2cb5a0" stroke-width="2"/>
+        <circle cx="180" cy="30" r="15" fill="#1a3a4a" stroke="#2cb5a0" stroke-width="2"/>
+        <circle cx="280" cy="50" r="15" fill="#1a3a4a" stroke="#2cb5a0" stroke-width="2"/>
+        <circle cx="130" cy="110" r="15" fill="#1a3a4a" stroke="#e8a930" stroke-width="2"/>
+        <circle cx="230" cy="110" r="15" fill="#1a3a4a" stroke="#e8a930" stroke-width="2"/>
+        <line x1="95" y1="55" x2="165" y2="35" stroke="#2cb5a0" stroke-width="1.5" opacity="0.6"/>
+        <line x1="195" y1="35" x2="265" y2="55" stroke="#2cb5a0" stroke-width="1.5" opacity="0.6"/>
+        <line x1="80" y1="65" x2="115" y2="100" stroke="#e8a930" stroke-width="1.5" opacity="0.6"/>
+        <line x1="280" y1="65" x2="245" y2="100" stroke="#e8a930" stroke-width="1.5" opacity="0.6"/>
+        <text x="80" y="54" text-anchor="middle" fill="#3dd9c1" font-size="11">A</text>
+        <text x="180" y="34" text-anchor="middle" fill="#3dd9c1" font-size="11">B</text>
+        <text x="280" y="54" text-anchor="middle" fill="#3dd9c1" font-size="11">C</text>
+        <text x="130" y="114" text-anchor="middle" fill="#f5c842" font-size="11">D</text>
+        <text x="230" y="114" text-anchor="middle" fill="#f5c842" font-size="11">E</text>
+        <text x="180" y="148" text-anchor="middle" fill="#2cb5a0" font-size="11" font-weight="bold">20世纪，现代物流与AI</text>
+      </svg>`,
+      byline: '不等式组的现代力量', headline: '从粮食分配到人工智能：线性规划',
+      para: '20世纪中期，数学家丹齐格发明了"线性规划"——用不等式组描述所有约束条件（资源限制、预算上限、需求下限），在满足所有限制的方案中找到最优解。今天航空排班、快递路线、AI训练都在用这个方法。每次你用手机叫外卖，背后的调度系统都在求解一个巨大的不等式组。'
+    }
+  ]
+};
+
+// ── Storybook render ──
+let storyPage = 0, storyPages = [];
+
+function renderStoryPage() {
+  const container = document.getElementById('story-cards-container');
+  const nav = document.getElementById('story-nav');
+  if (!container) return;
+  if (!storyPages.length) {
+    container.innerHTML = '<p style="color:var(--muted);font-size:13px">暂无故事内容。</p>';
+    nav.style.display = 'none'; return;
+  }
+  const pg = storyPages[storyPage];
+  container.innerHTML = `<div class="story-card active">
+    <div class="story-illustration">${pg.illustration}</div>
+    <div class="story-text-area">
+      <div class="story-byline">${pg.byline}</div>
+      <div class="story-headline">${pg.headline}</div>
+      <div class="story-para">${pg.para}</div>
+    </div>
+  </div>`;
+  if (storyPages.length > 1) {
+    nav.style.display = 'flex';
+    document.getElementById('story-dots').innerHTML =
+      storyPages.map((_,i) => `<div class="story-dot${i===storyPage?' active':''}"></div>`).join('');
+    document.getElementById('story-prev').disabled = storyPage === 0;
+    document.getElementById('story-next').disabled = storyPage === storyPages.length - 1;
+  } else { nav.style.display = 'none'; }
+}
+
+function storyNav(dir) {
+  storyPage = Math.max(0, Math.min(storyPages.length - 1, storyPage + dir));
+  renderStoryPage();
+}
+
+// ── Concept selector ──
+function selectConcept(key) {
+  const titles = {
+    inequality:'不等式是什么', properties:'不等式的性质',
+    negative:'乘负数为什么变号', solve:'解不等式的步骤',
+    numberline:'数轴与解集', system:'不等式组'
+  };
+  currentConcept = key;
+  document.querySelectorAll('.concept-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('cb-' + key).classList.add('active');
+  document.getElementById('conceptCardTitle').textContent = titles[key];
+  document.getElementById('intuition-text').innerHTML = INTUITION[key] || '';
+  const vc = document.getElementById('visual-container');
+  if (VISUALS[key]) { vc.innerHTML = VISUALS[key].render(); VISUALS[key].init(); }
+  storyPages = STORIES[key] || []; storyPage = 0;
+  renderStoryPage();
+  selectLayer('intuition');
+  loadConceptAI(key, titles[key]);
+}
+
+function selectLayer(layer) {
+  currentLayer = layer;
+  document.querySelectorAll('.layer-tab').forEach((t,i) =>
+    t.classList.toggle('active', ['intuition','visual','history'][i] === layer));
+  document.querySelectorAll('.layer-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('layer-' + layer).classList.add('active');
+}
+
+async function loadConceptAI(key, title) {
+  document.getElementById('conceptLoading').classList.add('active');
+  document.getElementById('conceptEmpty').style.display = 'none';
+  document.getElementById('conceptResponse').classList.add('visible');
+  const prompt = `为初一学生深度讲解"${title}"。包含：一个引发思考的核心问题、最常见的错误理解、一道检验理解的思考题。不要只复述定义，让学生理解"为什么"。`;
+  conceptHistory = [{ role: 'user', content: prompt }];
+  try {
+    const resp = await callAPI(prompt, CONCEPT_SYSTEM);
+    conceptHistory.push({ role: 'assistant', content: resp });
+    document.getElementById('conceptBody').innerHTML = '<p>' + formatResponse(resp) + '</p>';
+    document.getElementById('conceptFollowupBtn').disabled = false;
+  } catch(e) {
+    document.getElementById('conceptBody').innerHTML = `<div class="error-box">连接失败：${e.message}</div>`;
+  }
+  document.getElementById('conceptLoading').classList.remove('active');
+}
+
+// ── System example switcher ──
+function initSystemExamples() {
+  window.setSysExample = function(type, btn) {
+    document.querySelectorAll('#sys-svg').forEach(() => {});
+    const cap = document.getElementById('sys-caption'); if (!cap) return;
+    if (type === 'nooverlap') cap.textContent = '两个解集没有重合——不等式组无解。';
+    else if (type === 'subset') cap.textContent = '一个解集完全包含在另一个里——解集是较小的那段。';
+    else cap.textContent = '黄色是最终解集——两个解集重叠的部分。';
+  };
+}
+
+async function sendConceptFollowup() {
+  const input = document.getElementById('conceptFollowup');
+  const q = input.value.trim(); if (!q) return;
+  const chat = document.getElementById('conceptChatHistory');
+  chat.innerHTML += `<div class="chat-msg chat-user">${q}</div>`;
+  input.value = '';
+  document.getElementById('conceptFollowupBtn').disabled = true;
+  conceptHistory.push({ role: 'user', content: q });
+  try {
+    const resp = await callAPI(q, CONCEPT_SYSTEM, conceptHistory);
+    conceptHistory.push({ role: 'assistant', content: resp });
+    chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  } catch(e) {
+    chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
+  }
+  document.getElementById('conceptFollowupBtn').disabled = false;
+}
+  const input = document.getElementById('conceptFollowup');
+  const q = input.value.trim(); if (!q) return;
+  const chat = document.getElementById('conceptChatHistory');
+  chat.innerHTML += `<div class="chat-msg chat-user">${q}</div>`;
+  input.value = '';
+  document.getElementById('conceptFollowupBtn').disabled = true;
+  conceptHistory.push({ role: 'user', content: q });
+  try {
+    const resp = await callAPI(q, CONCEPT_SYSTEM, conceptHistory);
+    conceptHistory.push({ role: 'assistant', content: resp });
+    chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  } catch(e) {
+    chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
+  }
+  document.getElementById('conceptFollowupBtn').disabled = false;
+}
+
+// ── PRACTICE TAB ──
+const PRACTICE_SYSTEM = `你是"不等式侦探"，专门给初中生出不等式练习题并给出思维反馈。
+
+出题时：
+- 基础题：系数和常数较小，步骤3步以内，考查基本解题流程
+- 进阶题：有分数、括号，或结合生活场景（用不等式建模）
+- 挑战题：莫斯科难题风格，用逻辑谜题形式呈现，需要学生自己建立不等式模型
+
+出题格式：
+1. 先用一句话说明这道题考察什么能力
+2. 给出题目，用"【题目】"标注
+3. 给出一个思路提示（不要给解法），用"💡提示："标注
+
+反馈时：
+- 不只说对错，分析学生的思维路径
+- 如果有错，指出错在哪一步的思维上，而不只是计算结果
+- ⚠️标注最容易犯的那个错误
+- 给出正确的完整解题过程
+- 最后给一句鼓励`;
+
+function selectDiff(d) {
+  currentDiff = d;
+  ['easy','medium','hard'].forEach(x => {
+    document.getElementById('diff-'+x).classList.toggle('active', x===d);
+  });
+}
+
+function toggleType(t, btn) {
+  if (currentTypes.has(t) && currentTypes.size === 1) return;
+  btn.classList.toggle('active');
+  currentTypes.has(t) ? currentTypes.delete(t) : currentTypes.add(t);
+}
+
+async function generatePractice() {
+  document.getElementById('practiceLoading').classList.add('active');
+  document.getElementById('practiceEmpty').style.display = 'none';
+  document.getElementById('practiceContent').classList.add('visible');
+  document.getElementById('answerCard').style.display = 'block';
+  document.getElementById('answerInput').value = '';
+
+  const diffMap = { easy:'基础', medium:'进阶', hard:'挑战（莫斯科难题风格）' };
+  const types = [...currentTypes].join('、');
+  const prompt = `请出一道${diffMap[currentDiff]}难度的一元一次不等式题目，题型包含：${types}。出题后等待学生作答，不要提前给出解答。`;
+  practiceHistory = [{ role: 'user', content: prompt }];
+
+  try {
+    const resp = await callAPI(prompt, PRACTICE_SYSTEM);
+    practiceHistory.push({ role: 'assistant', content: resp });
+    currentQuestion = resp;
+    document.getElementById('practiceBody').innerHTML = '<p>' + formatResponse(resp) + '</p>';
+    document.getElementById('practiceFollowupBtn').disabled = false;
+  } catch(e) {
+    document.getElementById('practiceBody').innerHTML = `<div class="error-box">出题失败：${e.message}</div>`;
+  }
+  document.getElementById('practiceLoading').classList.remove('active');
+}
+
+async function submitAnswer() {
+  const answer = document.getElementById('answerInput').value.trim();
+  if (!answer || !currentQuestion) return;
+  document.getElementById('practiceLoading').classList.add('active');
+
+  const prompt = `学生提交的解题过程：\n${answer}\n\n请给出详细的思维反馈。`;
+  practiceHistory.push({ role: 'user', content: prompt });
+
+  try {
+    const resp = await callAPI(prompt, PRACTICE_SYSTEM, practiceHistory);
+    practiceHistory.push({ role: 'assistant', content: resp });
+    document.getElementById('practiceBody').innerHTML += '<hr style="border:none;border-top:1px solid rgba(255,255,254,0.08);margin:14px 0"><p>' + formatResponse(resp) + '</p>';
+    document.getElementById('practiceFollowupBtn').disabled = false;
+    document.getElementById('practiceBody').scrollTop = document.getElementById('practiceBody').scrollHeight;
+  } catch(e) {
+    document.getElementById('practiceBody').innerHTML += `<div class="error-box" style="margin:8px 0">反馈失败：${e.message}</div>`;
+  }
+  document.getElementById('practiceLoading').classList.remove('active');
+}
+
+async function sendPracticeFollowup() {
+  const input = document.getElementById('practiceFollowup');
+  const q = input.value.trim(); if (!q) return;
+  const chat = document.getElementById('practiceChatHistory');
+  chat.innerHTML += `<div class="chat-msg chat-user">${q}</div>`;
+  input.value = '';
+  document.getElementById('practiceFollowupBtn').disabled = true;
+  practiceHistory.push({ role: 'user', content: q });
+  try {
+    const resp = await callAPI(q, PRACTICE_SYSTEM, practiceHistory);
+    practiceHistory.push({ role: 'assistant', content: resp });
+    chat.innerHTML += `<div class="chat-msg chat-ai">${formatResponse(resp)}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+  } catch(e) {
+    chat.innerHTML += `<div class="error-box" style="margin:6px 0">回复失败</div>`;
+  }
+  document.getElementById('practiceFollowupBtn').disabled = false;
+}
+
+// ── Init ──
+window.addEventListener('load', () => {
+  selectConcept('inequality');
+});
+</script>
+</body>
+</html>
